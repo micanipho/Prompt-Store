@@ -1,14 +1,15 @@
 
 public class Customer : User
 {
-    private decimal Balance { get; set; }
-    private List<Order> OrderHistory { get; set; }
-    private Cart cart { get; set; }
+    public decimal Balance { get; private set; }
+    public List<Order> OrderHistory { get; private set; }
+    public Cart Cart { get; private set; }
 
-    public Customer(int Id, string userName, UserRole Role, string Password, string Address, string PhoneNumber)
+    public Customer(string userName,string Password)
         : base(userName, UserRole.Customer, Password)
     {
-        this.Address = Address;
-        this.PhoneNumber = PhoneNumber;
+        this.Balance = 0;
+        this.OrderHistory = new List<Order>();
+        this.Cart = new Cart();
     }
 }
