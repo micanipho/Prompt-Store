@@ -1,4 +1,4 @@
-namespace OnlineShopping.Domain.Enums;
+namespace Domain.Enums;
 
 public enum UserRole
 {

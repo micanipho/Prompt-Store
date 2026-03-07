@@ -37,7 +37,7 @@ A backend simulation of a real-world e-commerce platform built as a C# Console A
 
 ```
 src/
-├── OnlineShopping.Domain/          # Core domain — entities, interfaces, enums
+├── Domain/          # Core domain — entities, interfaces, enums
 │   ├── Entities/
 │   │   ├── User.cs
 │   │   ├── Customer.cs
@@ -57,7 +57,7 @@ src/
 │       ├── IProductRepository.cs
 │       └── IOrderRepository.cs
 │
-├── OnlineShopping.Application/     # Use cases and business logic
+├── Application/     # Use cases and business logic
 │   ├── Services/
 │   │   ├── AuthService.cs
 │   │   ├── ProductService.cs
@@ -75,13 +75,13 @@ src/
 │       ├── PlaceOrderRequest.cs
 │       └── AddFundsRequest.cs
 │
-├── OnlineShopping.Infrastructure/  # In-memory data storage
+├── Infrastructure/  # In-memory data storage
 │   └── Repositories/
 │       ├── InMemoryUserRepository.cs
 │       ├── InMemoryProductRepository.cs
 │       └── InMemoryOrderRepository.cs
 │
-└── OnlineShopping.ConsoleApp/      # Entry point and console menus
+└── ConsoleApp/      # Entry point and console menus
     ├── Program.cs
     └── Menus/
         ├── MainMenu.cs
