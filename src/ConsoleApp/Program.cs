@@ -4,7 +4,7 @@ public class Program
 {
     protected Program() { }
 
-    internal static readonly User? CurrentUser = null;
+    internal static User? CurrentUser { get; set; }
 
     public static void Main(string[] args)
     {
