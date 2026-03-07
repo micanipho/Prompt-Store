@@ -1,15 +1,17 @@
+namespace Domain.Entities;
 
+/// <summary>Represents a customer who can browse products, place orders, and manage their wallet.</summary>
 public class Customer : User
 {
     public decimal Balance { get; private set; }
     public List<Order> OrderHistory { get; private set; }
     public Cart Cart { get; private set; }
 
-    public Customer(string userName,string Password)
-        : base(userName, UserRole.Customer, Password)
+    public Customer(string userName, string password)
+        : base(userName, UserRole.Customer, password)
     {
-        this.Balance = 0;
-        this.OrderHistory = new List<Order>();
-        this.Cart = new Cart();
+        Balance = 0;
+        OrderHistory = [];
+        Cart = new Cart();
     }
 }

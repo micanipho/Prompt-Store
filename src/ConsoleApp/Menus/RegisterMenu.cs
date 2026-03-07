@@ -17,7 +17,7 @@ public class RegisterMenu
         var username = Console.ReadLine() ?? string.Empty;
 
         Console.Write("Enter password: ");
-        var password = ReadPassword();
+        var password = ConsoleHelper.ReadPassword();
 
         var request = new RegisterUserRequest
         {
@@ -40,26 +40,4 @@ public class RegisterMenu
         Console.ReadKey();
     }
 
-    private string ReadPassword()
-    {
-        var password = new StringBuilder();
-        while (true)
-        {
-            var key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.Enter)
-                break;
-            if (key.Key == ConsoleKey.Backspace && password.Length > 0)
-            {
-                password.Length--;
-                Console.Write("\b \b");
-            }
-            else if (!char.IsControl(key.KeyChar))
-            {
-                password.Append(key.KeyChar);
-                Console.Write("*");
-            }
-        }
-        Console.WriteLine();
-        return password.ToString();
-    }
 }

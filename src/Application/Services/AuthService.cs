@@ -1,5 +1,6 @@
 namespace Application.Services;
 
+/// <summary>Handles user registration and authentication.</summary>
 public class AuthService
 {
     private readonly IUserRepository _userRepository;
@@ -9,6 +10,7 @@ public class AuthService
         _userRepository = userRepository;
     }
 
+    /// <summary>Registers a new user. Throws if input is empty or username is already taken.</summary>
     public void Register(RegisterUserRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
@@ -30,6 +32,7 @@ public class AuthService
         _userRepository.AddUser(user);
     }
 
+    /// <summary>Validates credentials and returns the authenticated user. Throws if credentials are invalid.</summary>
     public User Login(LoginRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))

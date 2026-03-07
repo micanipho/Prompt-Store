@@ -1,5 +1,6 @@
 namespace ConsoleApp.Menus;
 
+/// <summary>Displays the application entry menu with options to register, login, or exit.</summary>
 public class MainMenu
 {
     private readonly AuthService _authService;

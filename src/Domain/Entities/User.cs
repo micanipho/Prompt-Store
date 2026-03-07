@@ -1,3 +1,6 @@
+namespace Domain.Entities;
+
+/// <summary>Base class for all users. Provides shared identity and authentication properties.</summary>
 public abstract class User
 {
     private static int _nextId = 0;

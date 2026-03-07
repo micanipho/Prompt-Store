@@ -17,7 +17,7 @@ public class LoginMenu
         var username = Console.ReadLine() ?? string.Empty;
 
         Console.Write("Password: ");
-        var password = ReadPassword();
+        var password = ConsoleHelper.ReadPassword();
 
         var loginRequest = new LoginRequest
         {
