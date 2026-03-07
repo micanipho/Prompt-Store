@@ -9,8 +9,10 @@ public class Program
     public static void Main(string[] args)
     {
         var userRepository = new InMemoryUserRepository();
+        var productRepository = new InMemoryProductRepository();
         var authService = new AuthService(userRepository);
-        var mainMenu = new MainMenu(authService);
+        var productService = new ProductService(productRepository);
+        var mainMenu = new MainMenu(authService, productService);
 
         mainMenu.Show();
     }
