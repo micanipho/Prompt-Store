@@ -2,7 +2,9 @@ namespace ConsoleApp;
 
 public class Program
 {
-    internal static User? CurrentUser = null;
+    protected Program() { }
+
+    internal static readonly User? CurrentUser = null;
 
     public static void Main(string[] args)
     {
