@@ -1,0 +1,45 @@
+namespace ConsoleApp.Menus;
+
+public class MainMenu
+{
+    private readonly AuthService _authService;
+
+    public MainMenu(AuthService authService)
+    {
+        _authService = authService;
+    }
+
+    public void Show()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("=== Welcome to the Prompt Store ===");
+            Console.WriteLine("1. Login");
+            Console.WriteLine("2. Register");
+            Console.WriteLine("3. Exit");
+            Console.Write("Please select an option: ");
+
+            var choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    var loginMenu = new LoginMenu(_authService);
+                    loginMenu.Show();
+                    break;
+                case "2":
+                    var registerMenu = new RegisterMenu(_authService);
+                    registerMenu.Show();
+                    break;
+                case "3":
+                    Console.WriteLine("Thank you for visiting the Prompt Store. Goodbye!");
+                    return;
+                default:
+                    Console.WriteLine("Invalid option. Please try again.");
+                    Thread.Sleep(2000);
+                    break;
+            }
+        }
+    }
+}
