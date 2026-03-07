@@ -1,9 +1,8 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the customer menu with shopping, order, and wallet options.</summary>
-public class CustomerMenu(AuthService authService, ProductService productService)
+public class CustomerMenu(ProductService productService)
 {
-    private readonly AuthService _authService = authService;
     private readonly ProductService _productService = productService;
 
     /// <summary>Displays the customer menu in a loop until the user logs out.</summary>

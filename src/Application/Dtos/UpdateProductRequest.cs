@@ -1,5 +1,6 @@
 namespace Application.Dtos;
 
+/// <summary>Carries the input data required to update an existing product, identified by its ID.</summary>
 public class UpdateProductRequest
 {
     public int Id { get; set; }

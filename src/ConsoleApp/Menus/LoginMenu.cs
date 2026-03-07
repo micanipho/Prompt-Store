@@ -36,11 +36,11 @@ public class LoginMenu
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_authService, _productService).Show();
+                new AdminMenu(_productService).Show();
             }
             else
             {
-                new CustomerMenu(_authService, _productService).Show();
+                new CustomerMenu(_productService).Show();
             }
         }
         catch (Exception ex)

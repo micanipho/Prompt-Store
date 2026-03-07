@@ -1,9 +1,8 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the administrator menu with product, order, and reporting options.</summary>
-public class AdminMenu(AuthService authService, ProductService productService)
+public class AdminMenu(ProductService productService)
 {
-    private readonly AuthService _authService = authService;
     private readonly ProductService _productService = productService;
 
     /// <summary>Displays the administrator menu in a loop until the user logs out.</summary>
