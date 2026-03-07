@@ -4,10 +4,12 @@ namespace ConsoleApp.Menus;
 public class MainMenu
 {
     private readonly AuthService _authService;
+    private readonly ProductService _productService;
 
-    public MainMenu(AuthService authService)
+    public MainMenu(AuthService authService, ProductService productService)
     {
         _authService = authService;
+        _productService = productService;
     }
 
     public void Show()
@@ -26,7 +28,7 @@ public class MainMenu
             switch (choice)
             {
                 case "1":
-                    var loginMenu = new LoginMenu(_authService);
+                    var loginMenu = new LoginMenu(_authService, _productService);
                     loginMenu.Show();
                     break;
                 case "2":

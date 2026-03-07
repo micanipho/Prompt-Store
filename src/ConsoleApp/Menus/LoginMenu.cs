@@ -3,10 +3,12 @@ namespace ConsoleApp.Menus;
 public class LoginMenu
 {
     private readonly AuthService _authService;
+    private readonly ProductService _productService;
 
-    public LoginMenu(AuthService authService)
+    public LoginMenu(AuthService authService, ProductService productService)
     {
         _authService = authService;
+        _productService = productService;
     }
 
     public void Show()
@@ -34,11 +36,11 @@ public class LoginMenu
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_authService).Show();
+                new AdminMenu(_authService, _productService).Show();
             }
             else
             {
-                new CustomerMenu(_authService).Show();
+                new CustomerMenu(_authService, _productService).Show();
             }
         }
         catch (Exception ex)
