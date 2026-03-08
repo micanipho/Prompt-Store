@@ -44,6 +44,37 @@ internal static class ConsoleHelper
         Console.WriteLine($"{"Total:",-47} {total,10:F2}");
     }
 
+    private const int OrderTableWidth = 65;
+
+    /// <summary>Prints a summary table of orders. Displays a "no orders" message if the list is empty.</summary>
+    public static void PrintOrderTable(IEnumerable<Order> orders)
+    {
+        var list = orders.ToList();
+        if (!list.Any())
+        {
+            Console.WriteLine("No orders found.");
+            return;
+        }
+
+        Console.WriteLine($"{"ID",-5} {"Placed At",-22} {"Status",-12} {"Items",6} {"Total",10}");
+        Console.WriteLine(new string('-', OrderTableWidth));
+        foreach (var o in list)
+            Console.WriteLine($"{o.Id,-5} {o.PlacedAt,-22:yyyy-MM-dd HH:mm:ss} {o.Status,-12} {o.Items.Count,6} {o.Total,10:F2}");
+    }
+
+    /// <summary>Prints the full details of a single order including all line items.</summary>
+    public static void PrintOrderDetails(Order order)
+    {
+        Console.WriteLine($"Order #{order.Id}  |  Placed: {order.PlacedAt:yyyy-MM-dd HH:mm:ss}  |  Status: {order.Status}");
+        Console.WriteLine(new string('-', OrderTableWidth));
+        Console.WriteLine($"{"Product",-30} {"Unit Price",10} {"Qty",5} {"Subtotal",10}");
+        Console.WriteLine(new string('-', OrderTableWidth));
+        foreach (var item in order.Items)
+            Console.WriteLine($"{item.Product.Name,-30} {item.UnitPrice,10:F2} {item.Quantity,5} {item.UnitPrice * item.Quantity,10:F2}");
+        Console.WriteLine(new string('-', OrderTableWidth));
+        Console.WriteLine($"{"Total:",-47} {order.Total,10:F2}");
+    }
+
     /// <summary>Reads a password from the console, masking input with asterisks.</summary>
     public static string ReadPassword()
     {

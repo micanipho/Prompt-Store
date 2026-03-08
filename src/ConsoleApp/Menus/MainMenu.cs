@@ -6,12 +6,14 @@ public class MainMenu
     private readonly AuthService _authService;
     private readonly ProductService _productService;
     private readonly CartService _cartService;
+    private readonly OrderService _orderService;
 
-    public MainMenu(AuthService authService, ProductService productService, CartService cartService)
+    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
+        _orderService = orderService;
     }
 
     public void Show()
@@ -30,7 +32,7 @@ public class MainMenu
             switch (choice)
             {
                 case "1":
-                    var loginMenu = new LoginMenu(_authService, _productService, _cartService);
+                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService);
                     loginMenu.Show();
                     break;
                 case "2":

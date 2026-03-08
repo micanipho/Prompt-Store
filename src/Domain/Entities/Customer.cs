@@ -14,4 +14,22 @@ public class Customer : User
         OrderHistory = [];
         Cart = new Cart();
     }
+
+    /// <summary>Adds funds to the customer's wallet balance.</summary>
+    public void AddFunds(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be greater than zero.");
+        Balance += amount;
+    }
+
+    /// <summary>Deducts funds from the customer's wallet balance.</summary>
+    public void DeductFunds(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be greater than zero.");
+        if (amount > Balance)
+            throw new InvalidOperationException("Insufficient balance.");
+        Balance -= amount;
+    }
 }
