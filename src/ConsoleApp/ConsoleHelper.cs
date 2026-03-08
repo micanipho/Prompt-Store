@@ -75,6 +75,32 @@ internal static class ConsoleHelper
         Console.WriteLine($"{"Total:",-47} {order.Total,10:F2}");
     }
 
+    #region Reviews
+
+    /// <summary>Prints all reviews for a product, including average rating.</summary>
+    public static void PrintProductReviews(IEnumerable<Review> reviews)
+    {
+        var list = reviews.ToList();
+        if (!list.Any())
+        {
+            Console.WriteLine("No reviews yet.");
+            return;
+        }
+
+        var average = list.Average(r => r.Rating);
+        Console.WriteLine($"Average Rating: {average:F1}/5 ({list.Count} review{(list.Count == 1 ? "" : "s")})\n");
+
+        foreach (var review in list)
+        {
+            Console.WriteLine($"  {new string('*', review.Rating)}{new string('.', 5 - review.Rating)}  ({review.Rating}/5)");
+            Console.WriteLine($"  \"{review.Comment}\"");
+            Console.WriteLine($"  — Customer #{review.CustomerId} on {review.CreatedAt:yyyy-MM-dd}");
+            Console.WriteLine();
+        }
+    }
+
+    #endregion
+
     #region Sales Report
 
     private const int StatusTableWidth = 35;

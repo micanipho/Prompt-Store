@@ -52,7 +52,7 @@ public class LoginMenu
             }
             else
             {
-                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _paymentService).Show();
+                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _paymentService, _reviewService).Show();
             }
         }
         catch (Exception ex)

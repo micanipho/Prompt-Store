@@ -15,6 +15,7 @@ public class Program
         var productRepository = new InMemoryProductRepository();
         var orderRepository = new InMemoryOrderRepository();
         var paymentRepository = new InMemoryPaymentRepository();
+        var reviewRepository = new InMemoryReviewRepository();
         var authService = new AuthService(userRepository);
         var productService = new ProductService(productRepository);
         var cartService = new CartService(productRepository);
@@ -22,7 +23,8 @@ public class Program
         var paymentService = new PaymentService(paymentRepository);
         var inventoryService = new InventoryService(productRepository);
         var reportService = new ReportService(orderRepository, paymentRepository);
-        var mainMenu = new MainMenu(authService, productService, cartService, orderService, paymentService, inventoryService, reportService);
+        var reviewService = new ReviewService(reviewRepository, productRepository);
+        var mainMenu = new MainMenu(authService, productService, cartService, orderService, paymentService, inventoryService, reportService, reviewService);
 
         mainMenu.Show();
     }
