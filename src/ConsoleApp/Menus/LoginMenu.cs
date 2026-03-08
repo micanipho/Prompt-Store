@@ -7,14 +7,16 @@ public class LoginMenu
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
     private readonly PaymentService _paymentService;
+    private readonly InventoryService _inventoryService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
         _paymentService = paymentService;
+        _inventoryService = inventoryService;
     }
 
     public void Show()
@@ -42,7 +44,7 @@ public class LoginMenu
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_productService, _orderService).Show();
+                new AdminMenu(_productService, _orderService, _inventoryService).Show();
             }
             else
             {
