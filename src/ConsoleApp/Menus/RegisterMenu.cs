@@ -19,11 +19,29 @@ public class RegisterMenu
         Console.Write("Enter password: ");
         var password = ConsoleHelper.ReadPassword();
 
+        Console.WriteLine("Select account type:");
+        Console.WriteLine("1. Customer");
+        Console.WriteLine("2. Administrator");
+        Console.Write("Choice: ");
+        var roleChoice = Console.ReadLine();
+
+        UserRole role;
+        if (roleChoice == "2")
+            role = UserRole.Admin;
+        else if (roleChoice == "1")
+            role = UserRole.Customer;
+        else
+        {
+            Console.WriteLine("Invalid choice. Press any key to return to the main menu.");
+            Console.ReadKey();
+            return;
+        }
+
         var request = new RegisterUserRequest
         {
             UserName = username,
             Password = password,
-            Role = UserRole.Customer
+            Role = role
         };
 
         try
