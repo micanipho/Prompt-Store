@@ -12,7 +12,8 @@ public class Program
         var productRepository = new InMemoryProductRepository();
         var authService = new AuthService(userRepository);
         var productService = new ProductService(productRepository);
-        var mainMenu = new MainMenu(authService, productService);
+        var cartService = new CartService(productRepository);
+        var mainMenu = new MainMenu(authService, productService, cartService);
 
         mainMenu.Show();
     }
