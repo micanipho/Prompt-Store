@@ -8,14 +8,16 @@ public class CustomerMenu
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
     private readonly PaymentService _paymentService;
+    private readonly ReviewService _reviewService;
 
-    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService)
+    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, ReviewService reviewService)
     {
         _customer = customer;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
         _paymentService = paymentService;
+        _reviewService = reviewService;
     }
 
     /// <summary>Displays the customer menu in a loop until the user logs out.</summary>
@@ -35,7 +37,8 @@ public class CustomerMenu
             Console.WriteLine("8. Add Wallet Funds");
             Console.WriteLine("9. View Order History");
             Console.WriteLine("10. Track Orders");
-            Console.WriteLine("11. Logout");
+            Console.WriteLine("11. Review Products");
+            Console.WriteLine("12. Logout");
             Console.Write("Please select an option: ");
 
             switch (Console.ReadLine())
@@ -50,7 +53,8 @@ public class CustomerMenu
                 case "8": AddWalletFunds(); break;
                 case "9": ViewOrderHistory(); break;
                 case "10": TrackOrders(); break;
-                case "11":
+                case "11": ReviewProduct(); break;
+                case "12":
                     Program.CurrentUser = null;
                     Console.WriteLine("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -67,7 +71,40 @@ public class CustomerMenu
     {
         Console.Clear();
         Console.WriteLine("=== Browse Products ===\n");
-        ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
+        var products = _productService.GetAllProducts().ToList();
+        ConsoleHelper.PrintProductTable(products);
+
+        if (!products.Any())
+        {
+            Console.WriteLine("\nPress any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.Write("\nEnter Product ID to view reviews (or press Enter to go back): ");
+        var input = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(input))
+            return;
+
+        if (!int.TryParse(input, out var productId))
+        {
+            Console.WriteLine("Invalid Product ID.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        var product = _productService.GetProductById(productId);
+        if (product == null)
+        {
+            Console.WriteLine("Product not found.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        Console.Clear();
+        Console.WriteLine($"=== Reviews for {product.Name} ===\n");
+        ConsoleHelper.PrintProductReviews(_reviewService.GetProductReviews(productId));
         Console.WriteLine("\nPress any key to continue.");
         Console.ReadKey();
     }
@@ -338,5 +375,71 @@ public class CustomerMenu
 
         Console.WriteLine("\nPress any key to continue.");
         Console.ReadKey();
+    }
+
+    private void ReviewProduct()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Review a Product ===\n");
+
+        var purchasedProducts = _customer.OrderHistory
+            .SelectMany(order => order.Items)
+            .Select(item => item.Product)
+            .DistinctBy(product => product.Id)
+            .ToList();
+
+        if (!purchasedProducts.Any())
+        {
+            Console.WriteLine("You have no purchased products to review.");
+            Console.WriteLine("\nPress any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.WriteLine("Your purchased products:\n");
+        ConsoleHelper.PrintProductTable(purchasedProducts);
+
+        Console.Write("\nEnter Product ID to review: ");
+        if (!int.TryParse(Console.ReadLine(), out var productId))
+        {
+            Console.WriteLine("Invalid Product ID.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        if (!purchasedProducts.Any(p => p.Id == productId))
+        {
+            Console.WriteLine("You have not purchased this product.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        Console.Write("Enter Rating (1-5): ");
+        if (!int.TryParse(Console.ReadLine(), out var rating))
+        {
+            Console.WriteLine("Invalid rating.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        Console.Write("Enter your review comment: ");
+        var comment = Console.ReadLine() ?? string.Empty;
+
+        try
+        {
+            _reviewService.SubmitReview(_customer, new SubmitReviewRequest
+            {
+                ProductId = productId,
+                Rating = rating,
+                Comment = comment
+            });
+            Console.WriteLine("Review submitted successfully!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 }
