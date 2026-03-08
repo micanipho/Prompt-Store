@@ -50,7 +50,7 @@ public class MainMenu
                     return;
                 default:
                     Console.WriteLine("Invalid option. Please try again.");
-                    Thread.Sleep(2000);
+                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     break;
             }
         }

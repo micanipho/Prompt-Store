@@ -1,11 +1,14 @@
 namespace ConsoleApp;
 
+/// <summary>Application entry point that wires up repositories, services, and launches the main menu.</summary>
 public class Program
 {
     protected Program() { }
 
+    /// <summary>The currently logged-in user, or null when no user is authenticated.</summary>
     internal static User? CurrentUser { get; set; }
 
+    /// <summary>Initialises all dependencies and starts the console application.</summary>
     public static void Main(string[] args)
     {
         var userRepository = new InMemoryUserRepository();

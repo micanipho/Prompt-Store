@@ -1,5 +1,6 @@
 namespace ConsoleApp.Menus;
 
+/// <summary>Handles the login flow, authenticating the user and routing to the appropriate role menu.</summary>
 public class LoginMenu
 {
     private readonly AuthService _authService;
@@ -21,6 +22,7 @@ public class LoginMenu
         _reportService = reportService;
     }
 
+    /// <summary>Prompts for credentials, authenticates the user, and opens the role-specific menu.</summary>
     public void Show()
     {
         Console.Clear();
@@ -42,7 +44,7 @@ public class LoginMenu
             var user = _authService.Login(loginRequest);
             Program.CurrentUser = user;
             Console.WriteLine($"Welcome back, {user.UserName}!");
-            Thread.Sleep(2000);
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
 
             if (user.Role == UserRole.Admin)
             {
