@@ -1,9 +1,10 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the administrator menu with product, order, and reporting options.</summary>
-public class AdminMenu(ProductService productService)
+public class AdminMenu(ProductService productService, OrderService orderService)
 {
     private readonly ProductService _productService = productService;
+    private readonly OrderService _orderService = orderService;
 
     /// <summary>Displays the administrator menu in a loop until the user logs out.</summary>
     public void Show()
@@ -16,7 +17,9 @@ public class AdminMenu(ProductService productService)
             Console.WriteLine("2. Update Product");
             Console.WriteLine("3. Delete Product");
             Console.WriteLine("4. View Products");
-            Console.WriteLine("5. Logout");
+            Console.WriteLine("5. View Orders");
+            Console.WriteLine("6. Update Order Status");
+            Console.WriteLine("7. Logout");
             Console.Write("Please select an option: ");
 
             switch (Console.ReadLine())
@@ -25,7 +28,9 @@ public class AdminMenu(ProductService productService)
                 case "2": UpdateProduct(); break;
                 case "3": DeleteProduct(); break;
                 case "4": ViewProducts(); break;
-                case "5":
+                case "5": ViewOrders(); break;
+                case "6": UpdateOrderStatus(); break;
+                case "7":
                     Program.CurrentUser = null;
                     Console.WriteLine("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -182,6 +187,59 @@ public class AdminMenu(ProductService productService)
         Console.WriteLine("=== View Products ===\n");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
         Console.WriteLine("\nPress any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void ViewOrders()
+    {
+        Console.Clear();
+        Console.WriteLine("=== All Orders ===\n");
+        ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
+        Console.WriteLine("\nPress any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void UpdateOrderStatus()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Update Order Status ===\n");
+        ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
+
+        Console.Write("\nEnter Order ID: ");
+        if (!int.TryParse(Console.ReadLine(), out var orderId))
+        {
+            Console.WriteLine("Invalid Order ID. Press any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.WriteLine("\nStatuses:");
+        foreach (var status in Enum.GetValues<OrderStatus>())
+            Console.WriteLine($"  {(int)status}. {status}");
+
+        Console.Write("Select new status: ");
+        if (!int.TryParse(Console.ReadLine(), out var statusValue) || !Enum.IsDefined(typeof(OrderStatus), statusValue))
+        {
+            Console.WriteLine("Invalid status. Press any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        try
+        {
+            _orderService.UpdateOrderStatus(new UpdateOrderStatusRequest
+            {
+                OrderId = orderId,
+                NewStatus = (OrderStatus)statusValue
+            });
+            Console.WriteLine("Order status updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.WriteLine("Press any key to continue.");
         Console.ReadKey();
     }
 

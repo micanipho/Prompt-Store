@@ -5,12 +5,14 @@ public class LoginMenu
     private readonly AuthService _authService;
     private readonly ProductService _productService;
     private readonly CartService _cartService;
+    private readonly OrderService _orderService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
+        _orderService = orderService;
     }
 
     public void Show()
@@ -38,11 +40,11 @@ public class LoginMenu
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_productService).Show();
+                new AdminMenu(_productService, _orderService).Show();
             }
             else
             {
-                new CustomerMenu((Customer)user, _productService, _cartService).Show();
+                new CustomerMenu((Customer)user, _productService, _cartService, _orderService).Show();
             }
         }
         catch (Exception ex)
