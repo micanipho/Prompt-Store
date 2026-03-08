@@ -7,18 +7,16 @@ public class MainMenu
     private readonly ProductService _productService;
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
-    private readonly PaymentService _paymentService;
     private readonly InventoryService _inventoryService;
     private readonly ReportService _reportService;
     private readonly ReviewService _reviewService;
 
-    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService)
+    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
-        _paymentService = paymentService;
         _inventoryService = inventoryService;
         _reportService = reportService;
         _reviewService = reviewService;
@@ -35,12 +33,12 @@ public class MainMenu
             Console.WriteLine("3. Exit");
             Console.Write("Please select an option: ");
 
-            var choice = Console.ReadLine();
+            var choice = Console.ReadLine()?.Trim();
 
             switch (choice)
             {
                 case "1":
-                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService, _paymentService, _inventoryService, _reportService, _reviewService);
+                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService, _inventoryService, _reportService, _reviewService);
                     loginMenu.Show();
                     break;
                 case "2":

@@ -96,6 +96,8 @@ public class ProductServiceTests
         _productService.AddProduct(new CreateProductRequest
         {
             Name = "Laptop",
+            Description = "A fast laptop",
+            Category = "Electronics",
             Price = 100m,
             Stock = 0
         });

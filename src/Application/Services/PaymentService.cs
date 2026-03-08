@@ -16,7 +16,7 @@ public class PaymentService
     /// <summary>Adds funds to a customer's wallet balance.</summary>
     public static void AddFunds(Customer customer, AddFundsRequest request)
     {
-        Guard.Against.NegativeOrZero(request.Amount);
+        Guard.Against.NegativeOrZero(request.Amount, message: "Amount must be greater than zero.");
         customer.AddFunds(request.Amount);
     }
 

@@ -14,6 +14,8 @@ public class ProductService
     public void AddProduct(CreateProductRequest request)
     {
         Guard.Against.NullOrWhiteSpace(request.Name, message: "Product name cannot be empty.");
+        Guard.Against.NullOrWhiteSpace(request.Description, message: "Product description cannot be empty.");
+        Guard.Against.NullOrWhiteSpace(request.Category, message: "Product category cannot be empty.");
         Guard.Against.NegativeOrZero(request.Price, message: "Product price must be greater than zero.");
         Guard.Against.Negative(request.Stock, message: "Stock cannot be negative.");
 
@@ -33,6 +35,8 @@ public class ProductService
         if (!_productRepository.Exists(request.Id))
             throw new InvalidOperationException($"Product with ID {request.Id} not found.");
         Guard.Against.NullOrWhiteSpace(request.Name, message: "Product name cannot be empty.");
+        Guard.Against.NullOrWhiteSpace(request.Description, message: "Product description cannot be empty.");
+        Guard.Against.NullOrWhiteSpace(request.Category, message: "Product category cannot be empty.");
         Guard.Against.NegativeOrZero(request.Price, message: "Product price must be greater than zero.");
         Guard.Against.Negative(request.Stock, message: "Stock cannot be negative.");
 
