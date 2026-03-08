@@ -14,24 +14,26 @@ public class RegisterMenu
     public void Show()
     {
         Console.Clear();
-        Console.WriteLine("=== Register ===");
+        ConsoleHelper.PrintHeader("Register");
 
-        var username = ConsoleHelper.ReadNonEmptyString("Enter username: ");
+        var username = ConsoleHelper.ReadNonEmptyString("  Enter username: ");
 
-        Console.Write("Enter password: ");
+        Console.Write("  Enter password: ");
         var password = ConsoleHelper.ReadPassword();
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            Console.WriteLine("Password cannot be empty. Press any key to return to the main menu.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Password cannot be empty.");
+            ConsoleHelper.PressAnyKey("Press any key to return to the main menu...");
             return;
         }
 
-        Console.WriteLine("Select account type:");
-        Console.WriteLine("1. Customer");
-        Console.WriteLine("2. Administrator");
-        Console.Write("Choice: ");
+        Console.WriteLine();
+        ConsoleHelper.PrintSubHeader("Account Type");
+        ConsoleHelper.PrintMenuOption("1", "Customer");
+        ConsoleHelper.PrintMenuOption("2", "Administrator");
+        Console.WriteLine();
+        ConsoleHelper.PrintPrompt("Choice: ");
         var roleChoice = Console.ReadLine()?.Trim();
 
         UserRole role;
@@ -41,8 +43,8 @@ public class RegisterMenu
             role = UserRole.Customer;
         else
         {
-            Console.WriteLine("Invalid choice. Press any key to return to the main menu.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid choice.");
+            ConsoleHelper.PressAnyKey("Press any key to return to the main menu...");
             return;
         }
 
@@ -56,15 +58,14 @@ public class RegisterMenu
         try
         {
             _authService.Register(request);
-            Console.WriteLine("Registration successful! Press any key to return to the main menu.");
+            ConsoleHelper.PrintSuccess("Registration successful!");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Registration failed: {ex.Message}");
-            Console.WriteLine("Press any key to return to the main menu.");
+            ConsoleHelper.PrintError($"Registration failed: {ex.Message}");
         }
 
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey("Press any key to return to the main menu...");
     }
 
 }

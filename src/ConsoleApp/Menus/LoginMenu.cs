@@ -26,11 +26,12 @@ public class LoginMenu
     public void Show()
     {
         Console.Clear();
-        Console.WriteLine("=== Login ===");
-        Console.Write("Username: ");
+        ConsoleHelper.PrintHeader("Login");
+
+        Console.Write("  Username: ");
         var username = Console.ReadLine()?.Trim() ?? string.Empty;
 
-        Console.Write("Password: ");
+        Console.Write("  Password: ");
         var password = ConsoleHelper.ReadPassword();
 
         var loginRequest = new LoginRequest
@@ -43,7 +44,7 @@ public class LoginMenu
         {
             var user = _authService.Login(loginRequest);
             Program.CurrentUser = user;
-            Console.WriteLine($"Welcome back, {user.UserName}!");
+            ConsoleHelper.PrintSuccess($"Welcome back, {user.UserName}!");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
 
             if (user.Role == UserRole.Admin)
@@ -57,9 +58,8 @@ public class LoginMenu
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Login failed: {ex.Message}");
-            Console.WriteLine("Press any key to return to the main menu.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError($"Login failed: {ex.Message}");
+            ConsoleHelper.PressAnyKey("Press any key to return to the main menu...");
         }
     }
 }

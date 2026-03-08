@@ -14,18 +14,30 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         while (true)
         {
             Console.Clear();
-            Console.WriteLine($"=== Administrator Menu === [{Program.CurrentUser?.UserName}]");
-            Console.WriteLine("1. Add Product");
-            Console.WriteLine("2. Update Product");
-            Console.WriteLine("3. Delete Product");
-            Console.WriteLine("4. Restock Product");
-            Console.WriteLine("5. View Products");
-            Console.WriteLine("6. View Low Stock Products");
-            Console.WriteLine("7. View Orders");
-            Console.WriteLine("8. Update Order Status");
-            Console.WriteLine("9. Generate Sales Reports");
-            Console.WriteLine("10. Logout");
-            Console.Write("Please select an option: ");
+            ConsoleHelper.PrintHeader($"Administrator Menu \u2502 {Program.CurrentUser?.UserName}");
+
+            ConsoleHelper.PrintSubHeader("Product Management");
+            ConsoleHelper.PrintMenuOption("1", "Add Product");
+            ConsoleHelper.PrintMenuOption("2", "Update Product");
+            ConsoleHelper.PrintMenuOption("3", "Delete Product");
+            ConsoleHelper.PrintMenuOption("4", "Restock Product");
+            ConsoleHelper.PrintMenuOption("5", "View Products");
+            ConsoleHelper.PrintMenuOption("6", "View Low Stock Products");
+            Console.WriteLine();
+
+            ConsoleHelper.PrintSubHeader("Order Management");
+            ConsoleHelper.PrintMenuOption("7", "View Orders");
+            ConsoleHelper.PrintMenuOption("8", "Update Order Status");
+            Console.WriteLine();
+
+            ConsoleHelper.PrintSubHeader("Analytics");
+            ConsoleHelper.PrintMenuOption("9", "Generate Sales Reports");
+            Console.WriteLine();
+
+            ConsoleHelper.PrintSeparator();
+            ConsoleHelper.PrintMenuOption("10", "Logout");
+            Console.WriteLine();
+            ConsoleHelper.PrintPrompt("Select an option: ");
 
             switch (Console.ReadLine()?.Trim())
             {
@@ -40,11 +52,11 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 case "9": GenerateSalesReport(); break;
                 case "10":
                     Program.CurrentUser = null;
-                    Console.WriteLine("Logged out successfully.");
+                    ConsoleHelper.PrintSuccess("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     return;
                 default:
-                    Console.WriteLine("Invalid option. Please try again.");
+                    ConsoleHelper.PrintError("Invalid option. Please try again.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     break;
             }
@@ -54,18 +66,18 @@ public class AdminMenu(ProductService productService, OrderService orderService,
     private void AddProduct()
     {
         Console.Clear();
-        Console.WriteLine("=== Add Product ===");
+        ConsoleHelper.PrintHeader("Add Product");
 
-        var name = ConsoleHelper.ReadNonEmptyString("Name: ");
-        var description = ConsoleHelper.ReadNonEmptyString("Description: ");
-        var category = ConsoleHelper.ReadNonEmptyString("Category: ");
-        var price = ConsoleHelper.ReadPositiveDecimal("Price: ");
+        var name = ConsoleHelper.ReadNonEmptyString("  Name: ");
+        var description = ConsoleHelper.ReadNonEmptyString("  Description: ");
+        var category = ConsoleHelper.ReadNonEmptyString("  Category: ");
+        var price = ConsoleHelper.ReadPositiveDecimal("  Price: ");
 
-        Console.Write("Stock: ");
+        Console.Write("  Stock: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var stock) || stock < 0)
         {
-            Console.WriteLine("Invalid stock quantity. Must be zero or a positive number. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid stock quantity. Must be zero or a positive number.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
@@ -79,28 +91,28 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 Price = price,
                 Stock = stock
             });
-            Console.WriteLine("Product added successfully.");
+            ConsoleHelper.PrintSuccess("Product added successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ConsoleHelper.PrintError(ex.Message);
         }
 
-        Console.WriteLine("Press any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void UpdateProduct()
     {
         Console.Clear();
-        Console.WriteLine("=== Update Product ===\n");
+        ConsoleHelper.PrintHeader("Update Product");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
-        Console.Write("\nEnter Product ID to update: ");
+        Console.WriteLine();
+        Console.Write("  Enter Product ID to update: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
         {
-            Console.WriteLine("Invalid ID. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid ID.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
@@ -108,41 +120,39 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         {
             var existing = _productService.GetProductById(id);
 
-            Console.Write($"Name [{existing.Name}]: ");
+            Console.Write($"  Name [{existing.Name}]: ");
             var name = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(name)) name = existing.Name;
 
-            Console.Write($"Description [{existing.Description}]: ");
+            Console.Write($"  Description [{existing.Description}]: ");
             var description = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(description)) description = existing.Description;
 
-            Console.Write($"Category [{existing.Category}]: ");
+            Console.Write($"  Category [{existing.Category}]: ");
             var category = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(category)) category = existing.Category;
 
-            Console.Write($"Price [{existing.Price:F2}]: ");
+            Console.Write($"  Price [{existing.Price:F2}]: ");
             var priceInput = Console.ReadLine()?.Trim();
             decimal price;
             if (string.IsNullOrWhiteSpace(priceInput))
                 price = existing.Price;
             else if (!decimal.TryParse(priceInput, out price) || price <= 0)
             {
-                Console.WriteLine("Invalid price. Must be a positive number.");
-                Console.WriteLine("Press any key to continue.");
-                Console.ReadKey();
+                ConsoleHelper.PrintError("Invalid price. Must be a positive number.");
+                ConsoleHelper.PressAnyKey();
                 return;
             }
 
-            Console.Write($"Stock [{existing.Stock}]: ");
+            Console.Write($"  Stock [{existing.Stock}]: ");
             var stockInput = Console.ReadLine()?.Trim();
             int stock;
             if (string.IsNullOrWhiteSpace(stockInput))
                 stock = existing.Stock;
             else if (!int.TryParse(stockInput, out stock) || stock < 0)
             {
-                Console.WriteLine("Invalid stock. Must be zero or a positive number.");
-                Console.WriteLine("Press any key to continue.");
-                Console.ReadKey();
+                ConsoleHelper.PrintError("Invalid stock. Must be zero or a positive number.");
+                ConsoleHelper.PressAnyKey();
                 return;
             }
 
@@ -156,86 +166,86 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 Stock = stock
             });
 
-            Console.WriteLine("Product updated successfully.");
+            ConsoleHelper.PrintSuccess("Product updated successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ConsoleHelper.PrintError(ex.Message);
         }
 
-        Console.WriteLine("Press any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void DeleteProduct()
     {
         Console.Clear();
-        Console.WriteLine("=== Delete Product ===\n");
+        ConsoleHelper.PrintHeader("Delete Product");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
-        Console.Write("\nEnter Product ID to delete: ");
+        Console.WriteLine();
+        Console.Write("  Enter Product ID to delete: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
         {
-            Console.WriteLine("Invalid ID. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid ID.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
         try
         {
             _productService.DeleteProduct(id);
-            Console.WriteLine("Product deleted successfully.");
+            ConsoleHelper.PrintSuccess("Product deleted successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ConsoleHelper.PrintError(ex.Message);
         }
 
-        Console.WriteLine("Press any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void ViewProducts()
     {
         Console.Clear();
-        Console.WriteLine("=== View Products ===\n");
+        ConsoleHelper.PrintHeader("View Products");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
-        Console.WriteLine("\nPress any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void ViewOrders()
     {
         Console.Clear();
-        Console.WriteLine("=== All Orders ===\n");
+        ConsoleHelper.PrintHeader("All Orders");
         ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
-        Console.WriteLine("\nPress any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void UpdateOrderStatus()
     {
         Console.Clear();
-        Console.WriteLine("=== Update Order Status ===\n");
+        ConsoleHelper.PrintHeader("Update Order Status");
         ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
 
-        Console.Write("\nEnter Order ID: ");
+        Console.WriteLine();
+        Console.Write("  Enter Order ID: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var orderId))
         {
-            Console.WriteLine("Invalid Order ID. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid Order ID.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
-        Console.WriteLine("\nStatuses:");
+        Console.WriteLine();
+        ConsoleHelper.PrintSubHeader("Available Statuses");
         foreach (var status in Enum.GetValues<OrderStatus>())
-            Console.WriteLine($"  {(int)status}. {status}");
+            ConsoleHelper.PrintMenuOption($"{(int)status}", $"{status}");
 
-        Console.Write("Select new status: ");
+        Console.WriteLine();
+        ConsoleHelper.PrintPrompt("Select new status: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var statusValue) || !Enum.IsDefined(typeof(OrderStatus), statusValue))
         {
-            Console.WriteLine("Invalid status. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid status.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
@@ -246,36 +256,36 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 OrderId = orderId,
                 NewStatus = (OrderStatus)statusValue
             });
-            Console.WriteLine("Order status updated successfully.");
+            ConsoleHelper.PrintSuccess("Order status updated successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ConsoleHelper.PrintError(ex.Message);
         }
 
-        Console.WriteLine("Press any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void RestockProduct()
     {
         Console.Clear();
-        Console.WriteLine("=== Restock Product ===\n");
+        ConsoleHelper.PrintHeader("Restock Product");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
-        Console.Write("\nEnter Product ID to restock: ");
+        Console.WriteLine();
+        Console.Write("  Enter Product ID to restock: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
         {
-            Console.WriteLine("Invalid ID. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid ID.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
-        Console.Write("Enter quantity to add: ");
+        Console.Write("  Enter quantity to add: ");
         if (!int.TryParse(Console.ReadLine()?.Trim(), out var quantity))
         {
-            Console.WriteLine("Invalid quantity. Press any key to continue.");
-            Console.ReadKey();
+            ConsoleHelper.PrintError("Invalid quantity.");
+            ConsoleHelper.PressAnyKey();
             return;
         }
 
@@ -287,30 +297,28 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 Quantity = quantity
             });
             var newStock = _inventoryService.GetStockLevel(productId);
-            Console.WriteLine($"Product restocked successfully. New stock level: {newStock}");
+            ConsoleHelper.PrintSuccess($"Product restocked successfully. New stock level: {newStock}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ConsoleHelper.PrintError(ex.Message);
         }
 
-        Console.WriteLine("Press any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void ViewLowStockProducts()
     {
         Console.Clear();
-        Console.WriteLine("=== Low Stock Products (Stock <= 5) ===\n");
+        ConsoleHelper.PrintHeader("Low Stock Products (Stock \u2264 5)");
         ConsoleHelper.PrintProductTable(_inventoryService.GetLowStockProducts());
-        Console.WriteLine("\nPress any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
     private void GenerateSalesReport()
     {
         Console.Clear();
-        Console.WriteLine("=== Sales Report ===\n");
+        ConsoleHelper.PrintHeader("Sales Report");
 
         ConsoleHelper.PrintSalesReport(
             _reportService.GetTotalOrders(),
@@ -320,8 +328,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             _reportService.GetTopSellingProducts(),
             _reportService.GetDailySales());
 
-        Console.WriteLine("\nPress any key to continue.");
-        Console.ReadKey();
+        ConsoleHelper.PressAnyKey();
     }
 
 }
