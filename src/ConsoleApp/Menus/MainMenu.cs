@@ -27,11 +27,14 @@ public class MainMenu
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("=== Welcome to the Prompt Store ===");
-            Console.WriteLine("1. Login");
-            Console.WriteLine("2. Register");
-            Console.WriteLine("3. Exit");
-            Console.Write("Please select an option: ");
+            ConsoleHelper.PrintBanner();
+            ConsoleHelper.PrintHeader("Main Menu");
+
+            ConsoleHelper.PrintMenuOption("1", "Login");
+            ConsoleHelper.PrintMenuOption("2", "Register");
+            ConsoleHelper.PrintMenuOption("3", "Exit");
+            Console.WriteLine();
+            ConsoleHelper.PrintPrompt("Select an option: ");
 
             var choice = Console.ReadLine()?.Trim();
 
@@ -46,10 +49,12 @@ public class MainMenu
                     registerMenu.Show();
                     break;
                 case "3":
-                    Console.WriteLine("Thank you for visiting the Prompt Store. Goodbye!");
+                    Console.WriteLine();
+                    ConsoleHelper.PrintSuccess("Thank you for visiting the Prompt Store. Goodbye!");
+                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     return;
                 default:
-                    Console.WriteLine("Invalid option. Please try again.");
+                    ConsoleHelper.PrintError("Invalid option. Please try again.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     break;
             }
