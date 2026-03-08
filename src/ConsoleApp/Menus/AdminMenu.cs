@@ -1,10 +1,11 @@
 namespace ConsoleApp.Menus;
 
-/// <summary>Displays the administrator menu with product, order, and reporting options.</summary>
-public class AdminMenu(ProductService productService, OrderService orderService)
+/// <summary>Displays the administrator menu with product, order, inventory, and reporting options.</summary>
+public class AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService)
 {
     private readonly ProductService _productService = productService;
     private readonly OrderService _orderService = orderService;
+    private readonly InventoryService _inventoryService = inventoryService;
 
     /// <summary>Displays the administrator menu in a loop until the user logs out.</summary>
     public void Show()
@@ -16,10 +17,12 @@ public class AdminMenu(ProductService productService, OrderService orderService)
             Console.WriteLine("1. Add Product");
             Console.WriteLine("2. Update Product");
             Console.WriteLine("3. Delete Product");
-            Console.WriteLine("4. View Products");
-            Console.WriteLine("5. View Orders");
-            Console.WriteLine("6. Update Order Status");
-            Console.WriteLine("7. Logout");
+            Console.WriteLine("4. Restock Product");
+            Console.WriteLine("5. View Products");
+            Console.WriteLine("6. View Low Stock Products");
+            Console.WriteLine("7. View Orders");
+            Console.WriteLine("8. Update Order Status");
+            Console.WriteLine("9. Logout");
             Console.Write("Please select an option: ");
 
             switch (Console.ReadLine())
@@ -27,10 +30,12 @@ public class AdminMenu(ProductService productService, OrderService orderService)
                 case "1": AddProduct(); break;
                 case "2": UpdateProduct(); break;
                 case "3": DeleteProduct(); break;
-                case "4": ViewProducts(); break;
-                case "5": ViewOrders(); break;
-                case "6": UpdateOrderStatus(); break;
-                case "7":
+                case "4": RestockProduct(); break;
+                case "5": ViewProducts(); break;
+                case "6": ViewLowStockProducts(); break;
+                case "7": ViewOrders(); break;
+                case "8": UpdateOrderStatus(); break;
+                case "9":
                     Program.CurrentUser = null;
                     Console.WriteLine("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -240,6 +245,56 @@ public class AdminMenu(ProductService productService, OrderService orderService)
         }
 
         Console.WriteLine("Press any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void RestockProduct()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Restock Product ===\n");
+        ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
+
+        Console.Write("\nEnter Product ID to restock: ");
+        if (!int.TryParse(Console.ReadLine(), out var productId))
+        {
+            Console.WriteLine("Invalid ID. Press any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.Write("Enter quantity to add: ");
+        if (!int.TryParse(Console.ReadLine(), out var quantity))
+        {
+            Console.WriteLine("Invalid quantity. Press any key to continue.");
+            Console.ReadKey();
+            return;
+        }
+
+        try
+        {
+            _inventoryService.RestockProduct(new RestockProductRequest
+            {
+                ProductId = productId,
+                Quantity = quantity
+            });
+            var newStock = _inventoryService.GetStockLevel(productId);
+            Console.WriteLine($"Product restocked successfully. New stock level: {newStock}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.WriteLine("Press any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void ViewLowStockProducts()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Low Stock Products (Stock <= 5) ===\n");
+        ConsoleHelper.PrintProductTable(_inventoryService.GetLowStockProducts());
+        Console.WriteLine("\nPress any key to continue.");
         Console.ReadKey();
     }
 
