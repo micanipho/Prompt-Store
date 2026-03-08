@@ -1,5 +1,6 @@
 namespace ConsoleApp.Menus;
 
+/// <summary>Handles the login flow, authenticating the user and routing to the appropriate role menu.</summary>
 public class LoginMenu
 {
     private readonly AuthService _authService;
@@ -8,8 +9,9 @@ public class LoginMenu
     private readonly OrderService _orderService;
     private readonly PaymentService _paymentService;
     private readonly InventoryService _inventoryService;
+    private readonly ReportService _reportService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService, ReportService reportService)
     {
         _authService = authService;
         _productService = productService;
@@ -17,8 +19,10 @@ public class LoginMenu
         _orderService = orderService;
         _paymentService = paymentService;
         _inventoryService = inventoryService;
+        _reportService = reportService;
     }
 
+    /// <summary>Prompts for credentials, authenticates the user, and opens the role-specific menu.</summary>
     public void Show()
     {
         Console.Clear();
@@ -40,11 +44,11 @@ public class LoginMenu
             var user = _authService.Login(loginRequest);
             Program.CurrentUser = user;
             Console.WriteLine($"Welcome back, {user.UserName}!");
-            Thread.Sleep(2000);
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_productService, _orderService, _inventoryService).Show();
+                new AdminMenu(_productService, _orderService, _inventoryService, _reportService).Show();
             }
             else
             {

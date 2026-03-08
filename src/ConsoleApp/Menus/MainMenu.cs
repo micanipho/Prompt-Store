@@ -9,8 +9,9 @@ public class MainMenu
     private readonly OrderService _orderService;
     private readonly PaymentService _paymentService;
     private readonly InventoryService _inventoryService;
+    private readonly ReportService _reportService;
 
-    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService)
+    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService, ReportService reportService)
     {
         _authService = authService;
         _productService = productService;
@@ -18,6 +19,7 @@ public class MainMenu
         _orderService = orderService;
         _paymentService = paymentService;
         _inventoryService = inventoryService;
+        _reportService = reportService;
     }
 
     public void Show()
@@ -36,7 +38,7 @@ public class MainMenu
             switch (choice)
             {
                 case "1":
-                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService, _paymentService, _inventoryService);
+                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService, _paymentService, _inventoryService, _reportService);
                     loginMenu.Show();
                     break;
                 case "2":
@@ -48,7 +50,7 @@ public class MainMenu
                     return;
                 default:
                     Console.WriteLine("Invalid option. Please try again.");
-                    Thread.Sleep(2000);
+                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
                     break;
             }
         }

@@ -1,5 +1,6 @@
 namespace ConsoleApp.Menus;
 
+/// <summary>Handles new user registration, collecting credentials and role selection.</summary>
 public class RegisterMenu
 {
     private readonly AuthService _authService;
@@ -9,6 +10,7 @@ public class RegisterMenu
         _authService = authService;
     }
 
+    /// <summary>Prompts for username, password, and role, then registers the new account.</summary>
     public void Show()
     {
         Console.Clear();
