@@ -20,12 +20,23 @@ public class Program
         var productService = new ProductService(productRepository);
         var cartService = new CartService(productRepository);
         var orderService = new OrderService(orderRepository, productRepository, paymentRepository);
-        var paymentService = new PaymentService(paymentRepository);
         var inventoryService = new InventoryService(productRepository);
         var reportService = new ReportService(orderRepository, paymentRepository);
         var reviewService = new ReviewService(reviewRepository, productRepository);
-        var mainMenu = new MainMenu(authService, productService, cartService, orderService, paymentService, inventoryService, reportService, reviewService);
+        var mainMenu = new MainMenu(authService, productService, cartService, orderService, inventoryService, reportService, reviewService);
 
-        mainMenu.Show();
+        try
+        {
+            mainMenu.Show();
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\nAn unexpected error occurred. The application will now exit.");
+            Console.WriteLine($"Details: {ex.Message}");
+            Console.ResetColor();
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey();
+        }
     }
 }

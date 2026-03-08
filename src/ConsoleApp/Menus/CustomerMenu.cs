@@ -7,16 +7,14 @@ public class CustomerMenu
     private readonly ProductService _productService;
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
-    private readonly PaymentService _paymentService;
     private readonly ReviewService _reviewService;
 
-    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, ReviewService reviewService)
+    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, ReviewService reviewService)
     {
         _customer = customer;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
-        _paymentService = paymentService;
         _reviewService = reviewService;
     }
 
@@ -41,7 +39,7 @@ public class CustomerMenu
             Console.WriteLine("12. Logout");
             Console.Write("Please select an option: ");
 
-            switch (Console.ReadLine())
+            switch (Console.ReadLine()?.Trim())
             {
                 case "1": BrowseProducts(); break;
                 case "2": SearchProducts(); break;
@@ -94,17 +92,18 @@ public class CustomerMenu
             return;
         }
 
-        var product = _productService.GetProductById(productId);
-        if (product == null)
+        try
         {
-            Console.WriteLine("Product not found.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
+            var product = _productService.GetProductById(productId);
+            Console.Clear();
+            Console.WriteLine($"=== Reviews for {product.Name} ===\n");
+            ConsoleHelper.PrintProductReviews(_reviewService.GetProductReviews(productId));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
 
-        Console.Clear();
-        Console.WriteLine($"=== Reviews for {product.Name} ===\n");
-        ConsoleHelper.PrintProductReviews(_reviewService.GetProductReviews(productId));
         Console.WriteLine("\nPress any key to continue.");
         Console.ReadKey();
     }
@@ -117,18 +116,18 @@ public class CustomerMenu
         Console.WriteLine("2. Search by Category");
         Console.Write("Select search type: ");
 
-        var choice = Console.ReadLine();
+        var choice = Console.ReadLine()?.Trim();
         IEnumerable<Product> results;
 
         if (choice == "1")
         {
-            Console.Write("Enter product name: ");
-            results = _productService.SearchByName(Console.ReadLine() ?? string.Empty);
+            var searchTerm = ConsoleHelper.ReadNonEmptyString("Enter product name: ");
+            results = _productService.SearchByName(searchTerm);
         }
         else if (choice == "2")
         {
-            Console.Write("Enter category: ");
-            results = _productService.SearchByCategory(Console.ReadLine() ?? string.Empty);
+            var searchTerm = ConsoleHelper.ReadNonEmptyString("Enter category: ");
+            results = _productService.SearchByCategory(searchTerm);
         }
         else
         {
@@ -150,7 +149,7 @@ public class CustomerMenu
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.Write("\nEnter Product ID: ");
-        if (!int.TryParse(Console.ReadLine(), out var productId))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
         {
             Console.WriteLine("Invalid Product ID.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -158,7 +157,7 @@ public class CustomerMenu
         }
 
         Console.Write("Enter Quantity: ");
-        if (!int.TryParse(Console.ReadLine(), out var quantity))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var quantity))
         {
             Console.WriteLine("Invalid quantity.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -209,7 +208,7 @@ public class CustomerMenu
         }
 
         Console.Write("\nEnter Product ID to update: ");
-        if (!int.TryParse(Console.ReadLine(), out var productId))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
         {
             Console.WriteLine("Invalid Product ID.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -217,7 +216,7 @@ public class CustomerMenu
         }
 
         Console.Write("Enter new quantity (0 to remove): ");
-        if (!int.TryParse(Console.ReadLine(), out var newQuantity))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var newQuantity))
         {
             Console.WriteLine("Invalid quantity.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -298,25 +297,11 @@ public class CustomerMenu
         Console.Clear();
         Console.WriteLine("=== Add Wallet Funds ===\n");
         Console.WriteLine($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
-        Console.Write("\nEnter amount to add: ");
 
-        if (!decimal.TryParse(Console.ReadLine(), out var amount))
-        {
-            Console.WriteLine("Invalid amount.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
-        }
+        var amount = ConsoleHelper.ReadPositiveDecimal("\nEnter amount to add: ");
 
-        try
-        {
-            PaymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
-            Console.WriteLine($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-
+        PaymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
+        Console.WriteLine($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
@@ -357,20 +342,23 @@ public class CustomerMenu
             return;
         }
 
-        try
+        if (!_customer.OrderHistory.Any(o => o.Id == orderId))
         {
-            // Ensure the order belongs to this customer
-            if (!_customer.OrderHistory.Any(o => o.Id == orderId))
-                throw new InvalidOperationException("Order not found in your history.");
-
-            var order = _orderService.GetOrderById(orderId);
-            Console.Clear();
-            Console.WriteLine("=== Order Details ===\n");
-            ConsoleHelper.PrintOrderDetails(order);
+            Console.WriteLine("Order not found in your history.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            try
+            {
+                var order = _orderService.GetOrderById(orderId);
+                Console.Clear();
+                Console.WriteLine("=== Order Details ===\n");
+                ConsoleHelper.PrintOrderDetails(order);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
 
         Console.WriteLine("\nPress any key to continue.");
@@ -400,7 +388,7 @@ public class CustomerMenu
         ConsoleHelper.PrintProductTable(purchasedProducts);
 
         Console.Write("\nEnter Product ID to review: ");
-        if (!int.TryParse(Console.ReadLine(), out var productId))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
         {
             Console.WriteLine("Invalid Product ID.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -415,15 +403,14 @@ public class CustomerMenu
         }
 
         Console.Write("Enter Rating (1-5): ");
-        if (!int.TryParse(Console.ReadLine(), out var rating))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var rating) || rating < 1 || rating > 5)
         {
-            Console.WriteLine("Invalid rating.");
+            Console.WriteLine("Invalid rating. Must be a whole number between 1 and 5.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             return;
         }
 
-        Console.Write("Enter your review comment: ");
-        var comment = Console.ReadLine() ?? string.Empty;
+        var comment = ConsoleHelper.ReadNonEmptyString("Enter your review comment: ");
 
         try
         {

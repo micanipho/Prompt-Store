@@ -186,6 +186,67 @@ internal static class ConsoleHelper
 
     #endregion
 
+    /// <summary>Reads a non-empty, trimmed string from the console. Re-prompts until valid input is provided.</summary>
+    public static string ReadNonEmptyString(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            var input = Console.ReadLine()?.Trim();
+            if (!string.IsNullOrWhiteSpace(input))
+                return input;
+            Console.WriteLine("Input cannot be empty. Please try again.");
+        }
+    }
+
+    /// <summary>Reads and parses an integer from the console. Re-prompts until a valid integer is entered.</summary>
+    public static int ReadInt(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            if (int.TryParse(Console.ReadLine()?.Trim(), out var value))
+                return value;
+            Console.WriteLine("Invalid number. Please enter a valid whole number.");
+        }
+    }
+
+    /// <summary>Reads and parses a positive integer (greater than zero). Re-prompts until valid.</summary>
+    public static int ReadPositiveInt(string prompt)
+    {
+        while (true)
+        {
+            var value = ReadInt(prompt);
+            if (value > 0)
+                return value;
+            Console.WriteLine("Value must be greater than zero.");
+        }
+    }
+
+    /// <summary>Reads and parses a decimal from the console. Re-prompts until a valid decimal is entered.</summary>
+    public static decimal ReadDecimal(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            if (decimal.TryParse(Console.ReadLine()?.Trim(), out var value))
+                return value;
+            Console.WriteLine("Invalid number. Please enter a valid amount.");
+        }
+    }
+
+    /// <summary>Reads and parses a positive decimal (greater than zero). Re-prompts until valid.</summary>
+    public static decimal ReadPositiveDecimal(string prompt)
+    {
+        while (true)
+        {
+            var value = ReadDecimal(prompt);
+            if (value > 0)
+                return value;
+            Console.WriteLine("Value must be greater than zero.");
+        }
+    }
+
     /// <summary>Reads a password from the console, masking input with asterisks.</summary>
     public static string ReadPassword()
     {

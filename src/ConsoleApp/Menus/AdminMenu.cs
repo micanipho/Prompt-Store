@@ -27,7 +27,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             Console.WriteLine("10. Logout");
             Console.Write("Please select an option: ");
 
-            switch (Console.ReadLine())
+            switch (Console.ReadLine()?.Trim())
             {
                 case "1": AddProduct(); break;
                 case "2": UpdateProduct(); break;
@@ -56,27 +56,15 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         Console.Clear();
         Console.WriteLine("=== Add Product ===");
 
-        Console.Write("Name: ");
-        var name = Console.ReadLine() ?? string.Empty;
-
-        Console.Write("Description: ");
-        var description = Console.ReadLine() ?? string.Empty;
-
-        Console.Write("Category: ");
-        var category = Console.ReadLine() ?? string.Empty;
-
-        Console.Write("Price: ");
-        if (!decimal.TryParse(Console.ReadLine(), out var price))
-        {
-            Console.WriteLine("Invalid price. Press any key to continue.");
-            Console.ReadKey();
-            return;
-        }
+        var name = ConsoleHelper.ReadNonEmptyString("Name: ");
+        var description = ConsoleHelper.ReadNonEmptyString("Description: ");
+        var category = ConsoleHelper.ReadNonEmptyString("Category: ");
+        var price = ConsoleHelper.ReadPositiveDecimal("Price: ");
 
         Console.Write("Stock: ");
-        if (!int.TryParse(Console.ReadLine(), out var stock))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var stock) || stock < 0)
         {
-            Console.WriteLine("Invalid stock quantity. Press any key to continue.");
+            Console.WriteLine("Invalid stock quantity. Must be zero or a positive number. Press any key to continue.");
             Console.ReadKey();
             return;
         }
@@ -109,7 +97,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.Write("\nEnter Product ID to update: ");
-        if (!int.TryParse(Console.ReadLine(), out var id))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
         {
             Console.WriteLine("Invalid ID. Press any key to continue.");
             Console.ReadKey();
@@ -133,12 +121,30 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             if (string.IsNullOrWhiteSpace(category)) category = existing.Category;
 
             Console.Write($"Price [{existing.Price:F2}]: ");
-            var priceInput = Console.ReadLine();
-            var price = string.IsNullOrWhiteSpace(priceInput) ? existing.Price : decimal.Parse(priceInput);
+            var priceInput = Console.ReadLine()?.Trim();
+            decimal price;
+            if (string.IsNullOrWhiteSpace(priceInput))
+                price = existing.Price;
+            else if (!decimal.TryParse(priceInput, out price) || price <= 0)
+            {
+                Console.WriteLine("Invalid price. Must be a positive number.");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }
 
             Console.Write($"Stock [{existing.Stock}]: ");
-            var stockInput = Console.ReadLine();
-            var stock = string.IsNullOrWhiteSpace(stockInput) ? existing.Stock : int.Parse(stockInput);
+            var stockInput = Console.ReadLine()?.Trim();
+            int stock;
+            if (string.IsNullOrWhiteSpace(stockInput))
+                stock = existing.Stock;
+            else if (!int.TryParse(stockInput, out stock) || stock < 0)
+            {
+                Console.WriteLine("Invalid stock. Must be zero or a positive number.");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }
 
             _productService.UpdateProduct(new UpdateProductRequest
             {
@@ -168,7 +174,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.Write("\nEnter Product ID to delete: ");
-        if (!int.TryParse(Console.ReadLine(), out var id))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
         {
             Console.WriteLine("Invalid ID. Press any key to continue.");
             Console.ReadKey();
@@ -214,7 +220,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
 
         Console.Write("\nEnter Order ID: ");
-        if (!int.TryParse(Console.ReadLine(), out var orderId))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var orderId))
         {
             Console.WriteLine("Invalid Order ID. Press any key to continue.");
             Console.ReadKey();
@@ -226,7 +232,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             Console.WriteLine($"  {(int)status}. {status}");
 
         Console.Write("Select new status: ");
-        if (!int.TryParse(Console.ReadLine(), out var statusValue) || !Enum.IsDefined(typeof(OrderStatus), statusValue))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var statusValue) || !Enum.IsDefined(typeof(OrderStatus), statusValue))
         {
             Console.WriteLine("Invalid status. Press any key to continue.");
             Console.ReadKey();
@@ -258,7 +264,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.Write("\nEnter Product ID to restock: ");
-        if (!int.TryParse(Console.ReadLine(), out var productId))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
         {
             Console.WriteLine("Invalid ID. Press any key to continue.");
             Console.ReadKey();
@@ -266,7 +272,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         }
 
         Console.Write("Enter quantity to add: ");
-        if (!int.TryParse(Console.ReadLine(), out var quantity))
+        if (!int.TryParse(Console.ReadLine()?.Trim(), out var quantity))
         {
             Console.WriteLine("Invalid quantity. Press any key to continue.");
             Console.ReadKey();

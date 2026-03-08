@@ -7,19 +7,19 @@ public class LoginMenu
     private readonly ProductService _productService;
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
-    private readonly PaymentService _paymentService;
     private readonly InventoryService _inventoryService;
     private readonly ReportService _reportService;
+    private readonly ReviewService _reviewService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService, InventoryService inventoryService, ReportService reportService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
-        _paymentService = paymentService;
         _inventoryService = inventoryService;
         _reportService = reportService;
+        _reviewService = reviewService;
     }
 
     /// <summary>Prompts for credentials, authenticates the user, and opens the role-specific menu.</summary>
@@ -28,7 +28,7 @@ public class LoginMenu
         Console.Clear();
         Console.WriteLine("=== Login ===");
         Console.Write("Username: ");
-        var username = Console.ReadLine() ?? string.Empty;
+        var username = Console.ReadLine()?.Trim() ?? string.Empty;
 
         Console.Write("Password: ");
         var password = ConsoleHelper.ReadPassword();
@@ -52,7 +52,7 @@ public class LoginMenu
             }
             else
             {
-                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _paymentService, _reviewService).Show();
+                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _reviewService).Show();
             }
         }
         catch (Exception ex)

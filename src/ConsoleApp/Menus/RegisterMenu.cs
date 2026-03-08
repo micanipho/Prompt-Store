@@ -15,17 +15,24 @@ public class RegisterMenu
     {
         Console.Clear();
         Console.WriteLine("=== Register ===");
-        Console.Write("Enter username: ");
-        var username = Console.ReadLine() ?? string.Empty;
+
+        var username = ConsoleHelper.ReadNonEmptyString("Enter username: ");
 
         Console.Write("Enter password: ");
         var password = ConsoleHelper.ReadPassword();
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            Console.WriteLine("Password cannot be empty. Press any key to return to the main menu.");
+            Console.ReadKey();
+            return;
+        }
 
         Console.WriteLine("Select account type:");
         Console.WriteLine("1. Customer");
         Console.WriteLine("2. Administrator");
         Console.Write("Choice: ");
-        var roleChoice = Console.ReadLine();
+        var roleChoice = Console.ReadLine()?.Trim();
 
         UserRole role;
         if (roleChoice == "2")
