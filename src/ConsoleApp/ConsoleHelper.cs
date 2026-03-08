@@ -75,6 +75,66 @@ internal static class ConsoleHelper
         Console.WriteLine($"{"Total:",-47} {order.Total,10:F2}");
     }
 
+    /// <summary>Prints a full sales report including totals, order status breakdown, top products, and daily sales.</summary>
+    public static void PrintSalesReport(
+        int totalOrders,
+        decimal totalRevenue,
+        decimal averageOrderValue,
+        IEnumerable<OrderStatusSummary> statusSummaries,
+        IEnumerable<ProductSalesSummary> topProducts,
+        IEnumerable<DailySalesSummary> dailySales)
+    {
+        Console.WriteLine("--- Overview ---");
+        Console.WriteLine($"  Total Orders:         {totalOrders}");
+        Console.WriteLine($"  Total Revenue:        {totalRevenue:F2}");
+        Console.WriteLine($"  Average Order Value:  {averageOrderValue:F2}");
+
+        Console.WriteLine();
+        Console.WriteLine("--- Orders by Status ---");
+        var statusList = statusSummaries.ToList();
+        if (statusList.Any())
+        {
+            Console.WriteLine($"{"Status",-15} {"Count",8} {"Revenue",12}");
+            Console.WriteLine(new string('-', 35));
+            foreach (var s in statusList)
+                Console.WriteLine($"{s.Status,-15} {s.Count,8} {s.Total,12:F2}");
+        }
+        else
+        {
+            Console.WriteLine("  No orders found.");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("--- Top Selling Products ---");
+        var productList = topProducts.ToList();
+        if (productList.Any())
+        {
+            Console.WriteLine($"{"ID",-5} {"Product",-25} {"Qty Sold",10} {"Revenue",12}");
+            Console.WriteLine(new string('-', 52));
+            foreach (var p in productList)
+                Console.WriteLine($"{p.ProductId,-5} {p.ProductName,-25} {p.TotalQuantitySold,10} {p.TotalRevenue,12:F2}");
+        }
+        else
+        {
+            Console.WriteLine("  No sales data available.");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("--- Daily Sales ---");
+        var dailyList = dailySales.ToList();
+        if (dailyList.Any())
+        {
+            Console.WriteLine($"{"Date",-14} {"Orders",8} {"Revenue",12}");
+            Console.WriteLine(new string('-', 34));
+            foreach (var d in dailyList)
+                Console.WriteLine($"{d.Date:yyyy-MM-dd}     {d.OrderCount,8} {d.Revenue,12:F2}");
+        }
+        else
+        {
+            Console.WriteLine("  No sales data available.");
+        }
+    }
+
     /// <summary>Reads a password from the console, masking input with asterisks.</summary>
     public static string ReadPassword()
     {

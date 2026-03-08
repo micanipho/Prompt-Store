@@ -18,7 +18,8 @@ public class Program
         var orderService = new OrderService(orderRepository, productRepository, paymentRepository);
         var paymentService = new PaymentService(paymentRepository);
         var inventoryService = new InventoryService(productRepository);
-        var mainMenu = new MainMenu(authService, productService, cartService, orderService, paymentService, inventoryService);
+        var reportService = new ReportService(orderRepository, paymentRepository);
+        var mainMenu = new MainMenu(authService, productService, cartService, orderService, paymentService, inventoryService, reportService);
 
         mainMenu.Show();
     }

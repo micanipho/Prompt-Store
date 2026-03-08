@@ -1,11 +1,12 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the administrator menu with product, order, inventory, and reporting options.</summary>
-public class AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService)
+public class AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService, ReportService reportService)
 {
     private readonly ProductService _productService = productService;
     private readonly OrderService _orderService = orderService;
     private readonly InventoryService _inventoryService = inventoryService;
+    private readonly ReportService _reportService = reportService;
 
     /// <summary>Displays the administrator menu in a loop until the user logs out.</summary>
     public void Show()
@@ -22,7 +23,8 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             Console.WriteLine("6. View Low Stock Products");
             Console.WriteLine("7. View Orders");
             Console.WriteLine("8. Update Order Status");
-            Console.WriteLine("9. Logout");
+            Console.WriteLine("9. Generate Sales Reports");
+            Console.WriteLine("10. Logout");
             Console.Write("Please select an option: ");
 
             switch (Console.ReadLine())
@@ -35,7 +37,8 @@ public class AdminMenu(ProductService productService, OrderService orderService,
                 case "6": ViewLowStockProducts(); break;
                 case "7": ViewOrders(); break;
                 case "8": UpdateOrderStatus(); break;
-                case "9":
+                case "9": GenerateSalesReport(); break;
+                case "10":
                     Program.CurrentUser = null;
                     Console.WriteLine("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -294,6 +297,23 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         Console.Clear();
         Console.WriteLine("=== Low Stock Products (Stock <= 5) ===\n");
         ConsoleHelper.PrintProductTable(_inventoryService.GetLowStockProducts());
+        Console.WriteLine("\nPress any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void GenerateSalesReport()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Sales Report ===\n");
+
+        ConsoleHelper.PrintSalesReport(
+            _reportService.GetTotalOrders(),
+            _reportService.GetTotalRevenue(),
+            _reportService.GetAverageOrderValue(),
+            _reportService.GetOrdersByStatus(),
+            _reportService.GetTopSellingProducts(),
+            _reportService.GetDailySales());
+
         Console.WriteLine("\nPress any key to continue.");
         Console.ReadKey();
     }
