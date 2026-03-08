@@ -5,13 +5,15 @@ public class OrderServiceTests
 {
     private readonly Mock<IOrderRepository> _orderRepositoryMock;
     private readonly Mock<IProductRepository> _productRepositoryMock;
+    private readonly Mock<IPaymentRepository> _paymentRepositoryMock;
     private readonly OrderService _orderService;
 
     public OrderServiceTests()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _productRepositoryMock = new Mock<IProductRepository>();
-        _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object);
+        _paymentRepositoryMock = new Mock<IPaymentRepository>();
+        _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _paymentRepositoryMock.Object);
     }
 
     private static Customer CreateCustomer(decimal balance = 5000m)
@@ -175,6 +177,20 @@ public class OrderServiceTests
         _orderService.PlaceOrder(customer);
 
         _orderRepositoryMock.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
+    }
+
+    [Fact]
+    public void PlaceOrder_Success_RecordsPayment()
+    {
+        var customer = CreateCustomer(balance: 5000m);
+        var product = CreateProduct(price: 1000m, stock: 10);
+        AddToCart(customer, product, 2);
+        _productRepositoryMock.Setup(r => r.GetById(1)).Returns(product);
+        _orderRepositoryMock.Setup(r => r.Add(It.IsAny<Order>())).Callback<Order>(o => o.Id = 1);
+
+        _orderService.PlaceOrder(customer);
+
+        _paymentRepositoryMock.Verify(r => r.Add(It.Is<Payment>(p => p.OrderId == 1 && p.Amount == 2000m)), Times.Once);
     }
 
     [Fact]

@@ -5,11 +5,13 @@ public class OrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IPaymentRepository _paymentRepository;
 
-    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository)
+    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IPaymentRepository paymentRepository)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
+        _paymentRepository = paymentRepository;
     }
 
     /// <summary>
@@ -66,6 +68,15 @@ public class OrderService
         customer.OrderHistory.Add(order);
         customer.DeductFunds(total);
         customer.Cart.Items.Clear();
+
+        // Record the payment transaction
+        var payment = new Payment
+        {
+            OrderId = order.Id,
+            Amount = total,
+            PaidAt = DateTime.Now
+        };
+        _paymentRepository.Add(payment);
 
         return order;
     }

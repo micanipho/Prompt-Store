@@ -7,13 +7,15 @@ public class CustomerMenu
     private readonly ProductService _productService;
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
+    private readonly PaymentService _paymentService;
 
-    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService)
+    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService)
     {
         _customer = customer;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
+        _paymentService = paymentService;
     }
 
     /// <summary>Displays the customer menu in a loop until the user logs out.</summary>
@@ -29,9 +31,11 @@ public class CustomerMenu
             Console.WriteLine("4. View Cart");
             Console.WriteLine("5. Update Cart");
             Console.WriteLine("6. Checkout");
-            Console.WriteLine("7. View Order History");
-            Console.WriteLine("8. Track Orders");
-            Console.WriteLine("9. Logout");
+            Console.WriteLine("7. View Wallet Balance");
+            Console.WriteLine("8. Add Wallet Funds");
+            Console.WriteLine("9. View Order History");
+            Console.WriteLine("10. Track Orders");
+            Console.WriteLine("11. Logout");
             Console.Write("Please select an option: ");
 
             switch (Console.ReadLine())
@@ -42,9 +46,11 @@ public class CustomerMenu
                 case "4": ViewCart(); break;
                 case "5": UpdateCart(); break;
                 case "6": Checkout(); break;
-                case "7": ViewOrderHistory(); break;
-                case "8": TrackOrders(); break;
-                case "9":
+                case "7": ViewWalletBalance(); break;
+                case "8": AddWalletFunds(); break;
+                case "9": ViewOrderHistory(); break;
+                case "10": TrackOrders(); break;
+                case "11":
                     Program.CurrentUser = null;
                     Console.WriteLine("Logged out successfully.");
                     Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
@@ -239,6 +245,42 @@ public class CustomerMenu
 
         Console.WriteLine("Press any key to continue.");
         Console.ReadKey();
+    }
+
+    private void ViewWalletBalance()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Wallet Balance ===\n");
+        Console.WriteLine($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        Console.WriteLine("\nPress any key to continue.");
+        Console.ReadKey();
+    }
+
+    private void AddWalletFunds()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Add Wallet Funds ===\n");
+        Console.WriteLine($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        Console.Write("\nEnter amount to add: ");
+
+        if (!decimal.TryParse(Console.ReadLine(), out var amount))
+        {
+            Console.WriteLine("Invalid amount.");
+            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+            return;
+        }
+
+        try
+        {
+            PaymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
+            Console.WriteLine($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
     private void ViewOrderHistory()

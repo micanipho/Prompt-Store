@@ -6,13 +6,15 @@ public class LoginMenu
     private readonly ProductService _productService;
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
+    private readonly PaymentService _paymentService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, PaymentService paymentService)
     {
         _authService = authService;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
+        _paymentService = paymentService;
     }
 
     public void Show()
@@ -44,7 +46,7 @@ public class LoginMenu
             }
             else
             {
-                new CustomerMenu((Customer)user, _productService, _cartService, _orderService).Show();
+                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _paymentService).Show();
             }
         }
         catch (Exception ex)
