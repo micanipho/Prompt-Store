@@ -1,121 +1,92 @@
 # Online Shopping Backend System – C# Console Application
 
-A backend simulation of a real-world e-commerce platform built as a C# Console Application. The system demonstrates object-oriented programming, Domain-Driven Design, LINQ querying, exception handling, and clean architecture.
+A robust backend simulation of an e-commerce platform built with C# and .NET 10. The system demonstrates modern software engineering practices, including Domain-Driven Design (DDD), Clean Architecture, Entity Framework Core, and SOLID principles.
 
 ---
 
-## Submissions
+## 🚀 Getting Started
 
-| Submission | Focus | Due |
-|---|---|---|
-| Submission 1 | Core backend functionality | 9 March 2026 – 12:00 PM |
-| Submission 2 | Software Design Patterns + architecture improvements | 9 March 2026 – 5:00 PM |
+### Prerequisites
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (LocalDB or Express)
 
----
+### Database Configuration
+1. Update the connection string in `src/ConsoleApp/appsettings.json` if necessary.
+2. The application automatically applies migrations and seeds initial data on startup.
 
-## Features
+### Build and Run
+```bash
+# Build the solution
+dotnet build
 
-**Customer**
-- Register and log in
-- Browse and search the product catalog
-- Manage shopping cart (add, update, remove)
-- Checkout and pay via simulated wallet
-- View wallet balance and add funds
-- View order history and track orders
-- Leave product reviews and ratings
-
-**Administrator**
-- Add, update, delete, and restock products
-- View and manage all orders
-- Update order statuses
-- Monitor low stock products
-- Generate sales reports
-
----
-
-## Project Structure
-
+# Run the console application
+dotnet run --project src/ConsoleApp/ConsoleApp.csproj
 ```
-src/
-├── Domain/          # Core domain — entities, interfaces, enums
-│   ├── Entities/
-│   │   ├── User.cs
-│   │   ├── Customer.cs
-│   │   ├── Administrator.cs
-│   │   ├── Product.cs
-│   │   ├── Cart.cs
-│   │   ├── CartItem.cs
-│   │   ├── Order.cs
-│   │   ├── OrderItem.cs
-│   │   ├── Payment.cs
-│   │   └── Review.cs
-│   ├── Enums/
-│   │   ├── OrderStatus.cs
-│   │   └── UserRole.cs
-│   └── Interfaces/
-│       ├── IUserRepository.cs
-│       ├── IProductRepository.cs
-│       └── IOrderRepository.cs
-│
-├── Application/     # Use cases and business logic
-│   ├── Services/
-│   │   ├── AuthService.cs
-│   │   ├── ProductService.cs
-│   │   ├── CartService.cs
-│   │   ├── OrderService.cs
-│   │   ├── PaymentService.cs
-│   │   ├── InventoryService.cs
-│   │   ├── ReviewService.cs
-│   │   └── ReportService.cs
-│   └── Dtos/
-│       ├── RegisterUserRequest.cs
-│       ├── LoginRequest.cs
-│       ├── CreateProductRequest.cs
-│       ├── UpdateProductRequest.cs
-│       ├── PlaceOrderRequest.cs
-│       └── AddFundsRequest.cs
-│
-├── Infrastructure/  # In-memory data storage
-│   └── Repositories/
-│       ├── InMemoryUserRepository.cs
-│       ├── InMemoryProductRepository.cs
-│       └── InMemoryOrderRepository.cs
-│
-└── ConsoleApp/      # Entry point and console menus
-    ├── Program.cs
-    └── Menus/
-        ├── MainMenu.cs
-        ├── CustomerMenu.cs
-        └── AdminMenu.cs
+
+### Run Tests
+```bash
+# Run all tests
+dotnet test
+
+# Run specific test projects
+dotnet test tests/Application.Tests/Application.Tests.csproj
+dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj
 ```
 
 ---
 
-## Architecture
+## 📅 Submissions
 
-This project follows **Domain-Driven Design (DDD)** with a **Clean Architecture** layer separation:
-
-| Layer | Project | Responsibility |
+| Submission | Focus | Due Date |
 |---|---|---|
-| Domain | `OnlineShopping.Domain` | Entities, interfaces, enums — no external dependencies |
-| Application | `OnlineShopping.Application` | Business logic, services, DTOs — depends only on Domain |
-| Infrastructure | `OnlineShopping.Infrastructure` | In-memory repositories implementing Domain interfaces |
-| Presentation | `OnlineShopping.ConsoleApp` | Console menus and user interaction — entry point |
-
-**Dependency rule:** outer layers depend on inner layers. The Domain layer has zero dependencies.
+| **Submission 1** | Core backend functionality & OOP | 9 March 2026 – 12:00 PM |
+| **Submission 2** | Design Patterns & Clean Architecture | 9 March 2026 – 5:00 PM |
 
 ---
 
-## Technical Stack
+## ✨ Features
 
-- **Language:** C# (.NET)
-- **Data storage:** In-memory collections (`List<T>`)
-- **Querying:** LINQ
-- **Design:** OOP — inheritance, polymorphism, interfaces
-- **Patterns (Submission 2):** Repository, Factory, Singleton, Observer, Strategy (TBD)
+### Customer Features
+- **Account Management:** Secure registration and login.
+- **Product Discovery:** Browse and search the product catalog.
+- **Shopping Cart:** Add, update, and remove items with real-time calculations.
+- **Checkout:** Process orders with automated inventory updates.
+- **Wallet System:** Manage balance and add funds for simulated payments.
+- **Order Tracking:** View order history and current status.
+- **Social:** Submit and view product reviews and ratings.
+
+### Administrator Features
+- **Catalog Management:** Create, update, and delete products.
+- **Inventory Control:** Restock products and monitor low-stock items.
+- **Order Fulfillment:** View all customer orders and update tracking statuses.
+- **Analytics:** Generate daily sales and product performance reports.
 
 ---
 
-## Coding Standards
+## 🏗️ Project Architecture
 
-See [RULES.md](RULES.md) for the full C# coding standards followed in this project.
+The system follows **Clean Architecture** principles, ensuring a clear separation of concerns:
+
+- **Domain:** Core entities (`User`, `Product`, `Order`, etc.), domain exceptions, and repository interfaces. No external dependencies.
+- **Application:** Business logic services (`AuthService`, `OrderService`, etc.) and DTOs. Coordinates domain objects to fulfill use cases.
+- **Infrastructure:** Data persistence using **Entity Framework Core**. Includes SQL Server implementations of repositories and the `ShoppingDbContext`.
+- **ConsoleApp:** The presentation layer providing a menu-driven CLI for user interaction.
+
+---
+
+## 🛠️ Technical Stack
+- **Framework:** .NET 10
+- **Persistence:** Entity Framework Core (SQL Server)
+- **Patterns:** Repository, Unit of Work, Dependency Injection, Data Transfer Objects (DTOs)
+- **Querying:** LINQ for efficient data processing
+- **Testing:** xUnit with Moq and FluentAssertions
+
+---
+
+## 📜 Documentation & Guidelines
+- [RULES.md](RULES.md) – Coding standards and naming conventions.
+- [TESTING.md](TESTING.md) – Testing strategy and guidelines.
+- [CLAUDE.md](CLAUDE.md) – Build, test, and development workflow.
+
+---
+*Developed for the Online Shopping Backend System Project.*
