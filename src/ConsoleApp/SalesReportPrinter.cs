@@ -16,7 +16,7 @@ internal static class SalesReportPrinter
         }
 
         var average = list.Average(r => r.Rating);
-        ConsoleHelper.WriteColored($"  Average Rating: {average:F1}/{Review.MaxRating} ({list.Count} review{(list.Count == 1 ? "" : "s")})", ConsoleColor.Yellow);
+        ConsoleHelper.WriteColored($"    Average Rating: {average:F1}/{Review.MaxRating} ({list.Count} review{(list.Count == 1 ? "" : "s")})", ConsoleColor.Yellow);
         Console.WriteLine();
 
         foreach (var review in list)
@@ -24,13 +24,13 @@ internal static class SalesReportPrinter
             var stars = new string('\u2605', review.Rating) + new string('\u2606', Review.MaxRating - review.Rating);
             var saved = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($"    {stars}");
+            Console.Write($"      {stars}");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"  ({review.Rating}/{Review.MaxRating})");
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine($"    \"{review.Comment}\"");
+            Console.WriteLine($"      \"{review.Comment}\"");
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine($"    \u2014 Customer #{review.CustomerId} on {review.CreatedAt:yyyy-MM-dd}");
+            Console.WriteLine($"      \u2014 Customer #{review.CustomerId} on {review.CreatedAt:yyyy-MM-dd}");
             Console.ForegroundColor = saved;
             Console.WriteLine();
         }
@@ -40,9 +40,9 @@ internal static class SalesReportPrinter
 
     #region Sales Report
 
-    private const int StatusTableWidth = 37;
-    private const int TopProductsTableWidth = 54;
-    private const int DailySalesTableWidth = 36;
+    private const int StatusTableWidth = 48;
+    private const int TopProductsTableWidth = 68;
+    private const int DailySalesTableWidth = 48;
 
     /// <summary>Prints a full sales report including totals, order status breakdown, top products, and daily sales.</summary>
     public static void PrintSalesReport(
@@ -62,9 +62,9 @@ internal static class SalesReportPrinter
     private static void PrintOverview(int totalOrders, decimal totalRevenue, decimal averageOrderValue)
     {
         ConsoleHelper.PrintSubHeader("Overview");
-        Console.WriteLine($"    Total Orders:         {totalOrders}");
-        Console.WriteLine($"    Total Revenue:        R{totalRevenue:F2}");
-        Console.WriteLine($"    Average Order Value:  R{averageOrderValue:F2}");
+        Console.WriteLine($"      Total Orders:         {totalOrders}");
+        Console.WriteLine($"      Total Revenue:        R{totalRevenue:F2}");
+        Console.WriteLine($"      Average Order Value:  R{averageOrderValue:F2}");
         Console.WriteLine();
     }
 
@@ -75,10 +75,10 @@ internal static class SalesReportPrinter
         if (statusList.Any())
         {
             ConsoleHelper.PrintTableTop(StatusTableWidth);
-            ConsoleHelper.PrintTableRow(StatusTableWidth, $"{"Status",-15} {"Count",8} {"Revenue",12}");
+            ConsoleHelper.PrintTableRow(StatusTableWidth, $"{"Status",-20} {"Count",10} {"Revenue",14}");
             ConsoleHelper.PrintTableMid(StatusTableWidth);
             foreach (var status in statusList)
-                ConsoleHelper.PrintTableRow(StatusTableWidth, $"{status.Status,-15} {status.Count,8} R{status.Total,12:F2}");
+                ConsoleHelper.PrintTableRow(StatusTableWidth, $"{status.Status,-20} {status.Count,10} R{status.Total,14:F2}");
             ConsoleHelper.PrintTableBot(StatusTableWidth);
         }
         else
@@ -95,10 +95,10 @@ internal static class SalesReportPrinter
         if (productList.Any())
         {
             ConsoleHelper.PrintTableTop(TopProductsTableWidth);
-            ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{"ID",-5} {"Product",-25} {"Qty Sold",10} {"Revenue",12}");
+            ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{"ID",-6} {"Product",-30} {"Qty Sold",12} {"Revenue",14}");
             ConsoleHelper.PrintTableMid(TopProductsTableWidth);
             foreach (var product in productList)
-                ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{product.ProductId,-5} {product.ProductName,-25} {product.TotalQuantitySold,10} R{product.TotalRevenue,12:F2}");
+                ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{product.ProductId,-6} {product.ProductName,-30} {product.TotalQuantitySold,12} R{product.TotalRevenue,14:F2}");
             ConsoleHelper.PrintTableBot(TopProductsTableWidth);
         }
         else
@@ -115,10 +115,10 @@ internal static class SalesReportPrinter
         if (dailyList.Any())
         {
             ConsoleHelper.PrintTableTop(DailySalesTableWidth);
-            ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{"Date",-14} {"Orders",8} {"Revenue",12}");
+            ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{"Date",-18} {"Orders",12} {"Revenue",14}");
             ConsoleHelper.PrintTableMid(DailySalesTableWidth);
             foreach (var day in dailyList)
-                ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{day.Date:yyyy-MM-dd}     {day.OrderCount,8} R{day.Revenue,12:F2}");
+                ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{day.Date:yyyy-MM-dd}         {day.OrderCount,12} R{day.Revenue,14:F2}");
             ConsoleHelper.PrintTableBot(DailySalesTableWidth);
         }
         else

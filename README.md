@@ -35,6 +35,63 @@ dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj
 
 ---
 
+## Running with Docker
+
+Docker Compose spins up a SQL Server container and the console application together, with no local SQL Server installation required.
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose plugin on Linux)
+
+### Quick Start
+
+```bash
+# 1. Build the app image (only needs to run when source code changes)
+docker compose build app
+
+# 2. Start SQL Server in the background and wait for it to become healthy
+docker compose up db -d
+
+# 3. Launch the interactive console application
+#    (--rm removes the container automatically when you exit)
+docker compose run --rm app
+```
+
+> **Why two steps?**  
+> `docker compose up` multiplexes log output from all services and never
+> forwards stdin to any container, so the console menus would not be
+> interactive. Running the app with `docker compose run` attaches your
+> terminal's stdin/stdout directly to the container, making the menus
+> fully usable.
+
+### Stopping the Environment
+
+```bash
+# Stop SQL Server (data is preserved in the mssql_data Docker volume)
+docker compose down
+
+# Stop and delete all persisted data
+docker compose down -v
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `DOTNET_ENVIRONMENT` | `Production` | Controls which `appsettings.*.json` overlay is loaded |
+| `ConnectionStrings__DefaultConnection` | *(set in docker-compose.yml)* | Full SQL Server connection string. Overrides `appsettings.json`. |
+| `SA_PASSWORD` | `YourStrong@Passw0rd` | SQL Server SA password (change before production use) |
+
+> **Security note:** The SA password in `docker-compose.yml` is for local development only. For any shared or production deployment, inject secrets via Docker secrets or a secrets manager rather than plain environment variables.
+
+### How It Works
+
+1. The `db` service starts SQL Server and waits until it is healthy.
+2. The `app` service starts only after the database is healthy (`depends_on: condition: service_healthy`).
+3. On first run, EF Core migrations are applied automatically (`context.Database.Migrate()` in `DatabaseSeeder`), and sample data is seeded.
+4. Subsequent runs reuse the data stored in the `mssql_data` Docker volume.
+
+---
+
 ## Features
 
 ### Customer Features
