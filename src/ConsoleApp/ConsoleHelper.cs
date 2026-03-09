@@ -11,12 +11,15 @@ internal static class ConsoleHelper
     /// <summary>Prints a styled section header with box-drawing borders.</summary>
     public static void PrintHeader(string title)
     {
-        var inner = $"  {title}  ";
-        var width = inner.Length;
-        var top = $"\u250c{new string('\u2500', width)}\u2510";
-        var mid = $"\u2502{inner}\u2502";
-        var bot = $"\u2514{new string('\u2500', width)}\u2518";
+        const int minWidth = 84;
+        var inner = $"    {title}    ";
+        var width = Math.Max(inner.Length, minWidth);
+        var padded = inner.PadRight(width);
+        var top = $"  \u250c{new string('\u2500', width)}\u2510";
+        var mid = $"  \u2502{padded}\u2502";
+        var bot = $"  \u2514{new string('\u2500', width)}\u2518";
 
+        Console.WriteLine();
         WriteColored(top, ConsoleColor.Cyan);
         WriteColored(mid, ConsoleColor.Cyan);
         WriteColored(bot, ConsoleColor.Cyan);
@@ -26,31 +29,36 @@ internal static class ConsoleHelper
     /// <summary>Prints a sub-section header with a subtle line.</summary>
     public static void PrintSubHeader(string title)
     {
-        WriteColored($"  \u2500\u2500 {title} \u2500\u2500", ConsoleColor.DarkCyan);
+        const int totalWidth = 82;
+        var dashes = new string('\u2500', 6);
+        var label = $" {title} ";
+        var remaining = totalWidth - dashes.Length * 2 - label.Length;
+        var rightDashes = new string('\u2500', Math.Max(6, remaining));
+        WriteColored($"    {dashes}{label}{rightDashes}", ConsoleColor.DarkCyan);
     }
 
     /// <summary>Prints a success message with a green checkmark.</summary>
     public static void PrintSuccess(string message)
     {
-        WriteColored($"  [\u2713] {message}", ConsoleColor.Green);
+        WriteColored($"    [\u2713] {message}", ConsoleColor.Green);
     }
 
     /// <summary>Prints an error message with a red cross.</summary>
     public static void PrintError(string message)
     {
-        WriteColored($"  [\u2717] {message}", ConsoleColor.Red);
+        WriteColored($"    [\u2717] {message}", ConsoleColor.Red);
     }
 
     /// <summary>Prints a warning message in yellow.</summary>
     public static void PrintWarning(string message)
     {
-        WriteColored($"  [!] {message}", ConsoleColor.Yellow);
+        WriteColored($"    [!] {message}", ConsoleColor.Yellow);
     }
 
     /// <summary>Prints an informational message in dark cyan.</summary>
     public static void PrintInfo(string message)
     {
-        WriteColored($"  {message}", ConsoleColor.DarkCyan);
+        WriteColored($"    {message}", ConsoleColor.DarkCyan);
     }
 
     /// <summary>Prints the application welcome banner.</summary>
@@ -75,23 +83,23 @@ internal static class ConsoleHelper
     {
         var saved = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write($"   [{number}]");
+        Console.Write($"      [{number,2}]");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine($"  {label}");
         Console.ForegroundColor = saved;
     }
 
     /// <summary>Prints a thin separator line.</summary>
-    public static void PrintSeparator(int width = 55)
+    public static void PrintSeparator(int width = 84)
     {
-        WriteColored($"  {new string('\u2500', width)}", ConsoleColor.DarkGray);
+        WriteColored($"    {new string('\u2500', width)}", ConsoleColor.DarkGray);
     }
 
     /// <summary>Prints a "press any key" prompt with subtle styling.</summary>
     public static void PressAnyKey(string message = "Press any key to continue...")
     {
         Console.WriteLine();
-        WriteColored($"  {message}", ConsoleColor.DarkGray);
+        WriteColored($"    {message}", ConsoleColor.DarkGray);
         Console.ReadKey(true);
     }
 
@@ -100,7 +108,7 @@ internal static class ConsoleHelper
     {
         var saved = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write($"  \u25b6 ");
+        Console.Write($"    \u25b6 ");
         Console.ForegroundColor = ConsoleColor.White;
         Console.Write(message);
         Console.ForegroundColor = saved;
@@ -132,7 +140,7 @@ internal static class ConsoleHelper
 
     #region Tables
 
-    private const int ProductTableWidth = 67;
+    private const int ProductTableWidth = 80;
 
     /// <summary>Prints a formatted table of products. Displays a "no products" message if the list is empty.</summary>
     public static void PrintProductTable(IEnumerable<Product> products)
@@ -145,14 +153,14 @@ internal static class ConsoleHelper
         }
 
         PrintTableTop(ProductTableWidth);
-        PrintTableRow(ProductTableWidth, $"{"ID",-5} {"Name",-25} {"Category",-15} {"Price",10} {"Stock",6}");
+        PrintTableRow(ProductTableWidth, $"{"ID",-6} {"Name",-30} {"Category",-18} {"Price",12} {"Stock",8}");
         PrintTableMid(ProductTableWidth);
         foreach (var product in list)
-            PrintTableRow(ProductTableWidth, $"{product.Id,-5} {product.Name,-25} {product.Category,-15} R{product.Price,10:F2} {product.Stock,6}");
+            PrintTableRow(ProductTableWidth, $"{product.Id,-6} {product.Name,-30} {product.Category,-18} R{product.Price,11:F2} {product.Stock,8}");
         PrintTableBot(ProductTableWidth);
     }
 
-    private const int CartTableWidth = 61;
+    private const int CartTableWidth = 76;
 
     /// <summary>Prints a formatted table of cart items with subtotals and a grand total.</summary>
     public static void PrintCartTable(IEnumerable<CartItem> items, decimal total)
@@ -165,16 +173,16 @@ internal static class ConsoleHelper
         }
 
         PrintTableTop(CartTableWidth);
-        PrintTableRow(CartTableWidth, $"{"ID",-5} {"Product",-25} {"Price",10} {"Qty",5} {"Subtotal",10}");
+        PrintTableRow(CartTableWidth, $"{"ID",-6} {"Product",-30} {"Price",12} {"Qty",8} {"Subtotal",14}");
         PrintTableMid(CartTableWidth);
         foreach (var item in list)
-            PrintTableRow(CartTableWidth, $"{item.Product.Id,-5} {item.Product.Name,-25} {item.Product.Price,10:F2} {item.Quantity,5} R{item.Product.Price * item.Quantity,10:F2}");
+            PrintTableRow(CartTableWidth, $"{item.Product.Id,-6} {item.Product.Name,-30} {item.Product.Price,12:F2} {item.Quantity,8} R{item.Product.Price * item.Quantity,13:F2}");
         PrintTableMid(CartTableWidth);
-        PrintTableRow(CartTableWidth, $"{"Total:",-49} R{total,10:F2}");
+        PrintTableRow(CartTableWidth, $"{"Total:",-60} R{total,13:F2}");
         PrintTableBot(CartTableWidth);
     }
 
-    private const int OrderTableWidth = 61;
+    private const int OrderTableWidth = 76;
 
     /// <summary>Prints a summary table of orders. Displays a "no orders" message if the list is empty.</summary>
     public static void PrintOrderTable(IEnumerable<Order> orders)
@@ -187,14 +195,14 @@ internal static class ConsoleHelper
         }
 
         PrintTableTop(OrderTableWidth);
-        PrintTableRow(OrderTableWidth, $"{"ID",-5} {"Placed At",-22} {"Status",-12} {"Items",6} {"Total",10}");
+        PrintTableRow(OrderTableWidth, $"{"ID",-6} {"Placed At",-24} {"Status",-16} {"Items",8} {"Total",14}");
         PrintTableMid(OrderTableWidth);
         foreach (var order in list)
-            PrintTableRow(OrderTableWidth, $"{order.Id,-5} {order.PlacedAt,-22:yyyy-MM-dd HH:mm:ss} {order.Status,-12} {order.Items.Count,6} R{order.Total,10:F2}");
+            PrintTableRow(OrderTableWidth, $"{order.Id,-6} {order.PlacedAt,-24:yyyy-MM-dd HH:mm:ss} {order.Status,-16} {order.Items.Count,8} R{order.Total,13:F2}");
         PrintTableBot(OrderTableWidth);
     }
 
-    private const int OrderDetailsTableWidth = 59;
+    private const int OrderDetailsTableWidth = 74;
 
     /// <summary>Prints the full details of a single order including all line items.</summary>
     public static void PrintOrderDetails(Order order)
@@ -202,34 +210,34 @@ internal static class ConsoleHelper
         PrintInfo($"Order #{order.Id}  \u2502  Placed: {order.PlacedAt:yyyy-MM-dd HH:mm:ss}  \u2502  Status: {order.Status}");
         if (!string.IsNullOrEmpty(order.DiscountApplied) && order.DiscountApplied != "None")
             PrintInfo($"Discount: {order.DiscountApplied}");
-            
+
         Console.WriteLine();
         PrintTableTop(OrderDetailsTableWidth);
-        PrintTableRow(OrderDetailsTableWidth, $"{"Product",-30} {"Unit Price",10} {"Qty",5} {"Subtotal",10}");
+        PrintTableRow(OrderDetailsTableWidth, $"{"Product",-34} {"Unit Price",14} {"Qty",8} {"Subtotal",14}");
         PrintTableMid(OrderDetailsTableWidth);
         foreach (var item in order.Items)
-            PrintTableRow(OrderDetailsTableWidth, $"{item.Product.Name,-30} R{item.UnitPrice,10:F2} {item.Quantity,5} R{item.UnitPrice * item.Quantity,10:F2}");
+            PrintTableRow(OrderDetailsTableWidth, $"{item.Product.Name,-34} R{item.UnitPrice,13:F2} {item.Quantity,8} R{item.UnitPrice * item.Quantity,13:F2}");
         PrintTableMid(OrderDetailsTableWidth);
-        PrintTableRow(OrderDetailsTableWidth, $"{"Total:",-47} R{order.Total,10:F2}");
+        PrintTableRow(OrderDetailsTableWidth, $"{"Total:",-58} R{order.Total,13:F2}");
         PrintTableBot(OrderDetailsTableWidth);
     }
 
     /// <summary>Prints the top border of a table.</summary>
     internal static void PrintTableTop(int innerWidth)
     {
-        WriteColored($"  \u250c{new string('\u2500', innerWidth + 2)}\u2510", ConsoleColor.DarkGray);
+        WriteColored($"    \u250c{new string('\u2500', innerWidth + 4)}\u2510", ConsoleColor.DarkGray);
     }
 
     /// <summary>Prints a middle separator row in a table.</summary>
     internal static void PrintTableMid(int innerWidth)
     {
-        WriteColored($"  \u251c{new string('\u2500', innerWidth + 2)}\u2524", ConsoleColor.DarkGray);
+        WriteColored($"    \u251c{new string('\u2500', innerWidth + 4)}\u2524", ConsoleColor.DarkGray);
     }
 
     /// <summary>Prints the bottom border of a table.</summary>
     internal static void PrintTableBot(int innerWidth)
     {
-        WriteColored($"  \u2514{new string('\u2500', innerWidth + 2)}\u2518", ConsoleColor.DarkGray);
+        WriteColored($"    \u2514{new string('\u2500', innerWidth + 4)}\u2518", ConsoleColor.DarkGray);
     }
 
     /// <summary>Prints a single content row inside a table.</summary>
@@ -238,11 +246,11 @@ internal static class ConsoleHelper
         var padded = content.PadRight(innerWidth);
         var saved = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.Write("  \u2502 ");
+        Console.Write("    \u2502  ");
         Console.ForegroundColor = ConsoleColor.White;
         Console.Write(padded);
         Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.WriteLine(" \u2502");
+        Console.WriteLine("  \u2502");
         Console.ForegroundColor = saved;
     }
 

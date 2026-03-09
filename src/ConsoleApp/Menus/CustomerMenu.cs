@@ -1,6 +1,6 @@
 namespace ConsoleApp.Menus;
 
-/// <summary>Displays the customer menu with shopping, order, and wallet options.</summary>
+/// <summary>Displays the customer menu with shopping, order, wallet, and AI assistant options.</summary>
 public partial class CustomerMenu : BaseMenu
 {
     private readonly Customer _customer;
@@ -9,8 +9,9 @@ public partial class CustomerMenu : BaseMenu
     private readonly OrderService _orderService;
     private readonly ReviewService _reviewService;
     private readonly PaymentService _paymentService;
+    private readonly ShoppingAssistantService _assistantService;
 
-    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, ReviewService reviewService, PaymentService paymentService)
+    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, ReviewService reviewService, PaymentService paymentService, ShoppingAssistantService assistantService)
     {
         _customer = customer;
         _productService = productService;
@@ -18,6 +19,7 @@ public partial class CustomerMenu : BaseMenu
         _orderService = orderService;
         _reviewService = reviewService;
         _paymentService = paymentService;
+        _assistantService = assistantService;
 
         // Register Commands
         AddCommand("1", "Browse Products", BrowseProducts);
@@ -31,6 +33,7 @@ public partial class CustomerMenu : BaseMenu
         AddCommand("9", "View Order History", ViewOrderHistory);
         AddCommand("10", "Track Orders", TrackOrders);
         AddCommand("11", "Review Products", ReviewProduct);
+        AddCommand("12", "AI Shopping Assistant", StartShoppingAssistant);
     }
 
     protected override string Header => "Customer Menu";
@@ -58,6 +61,10 @@ public partial class CustomerMenu : BaseMenu
         ConsoleHelper.PrintMenuOption("9", _commands["9"].Description);
         ConsoleHelper.PrintMenuOption("10", _commands["10"].Description);
         ConsoleHelper.PrintMenuOption("11", _commands["11"].Description);
+        Console.WriteLine();
+
+        ConsoleHelper.PrintSubHeader("AI Assistant");
+        ConsoleHelper.PrintMenuOption("12", _commands["12"].Description);
         Console.WriteLine();
     }
 
