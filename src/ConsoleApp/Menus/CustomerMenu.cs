@@ -1,7 +1,7 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the customer menu with shopping, order, and wallet options.</summary>
-public partial class CustomerMenu
+public partial class CustomerMenu : BaseMenu
 {
     private readonly Customer _customer;
     private readonly ProductService _productService;
@@ -18,68 +18,56 @@ public partial class CustomerMenu
         _orderService = orderService;
         _reviewService = reviewService;
         _paymentService = paymentService;
+
+        // Register Commands
+        AddCommand("1", "Browse Products", BrowseProducts);
+        AddCommand("2", "Search Products", SearchProducts);
+        AddCommand("3", "Add Product to Cart", AddProductToCart);
+        AddCommand("4", "View Cart", ViewCart);
+        AddCommand("5", "Update Cart", UpdateCart);
+        AddCommand("6", "Checkout", Checkout);
+        AddCommand("7", "View Wallet Balance", ViewWalletBalance);
+        AddCommand("8", "Add Wallet Funds", AddWalletFunds);
+        AddCommand("9", "View Order History", ViewOrderHistory);
+        AddCommand("10", "Track Orders", TrackOrders);
+        AddCommand("11", "Review Products", ReviewProduct);
     }
 
-    /// <summary>Displays the customer menu in a loop until the user logs out.</summary>
-    public void Show()
+    protected override string Header => "Customer Menu";
+
+    protected override void PrintMenuContent()
     {
-        while (true)
-        {
-            Console.Clear();
-            ConsoleHelper.PrintHeader($"Customer Menu \u2502 {Program.CurrentUser?.UserName}");
+        ConsoleHelper.PrintSubHeader("Shopping");
+        ConsoleHelper.PrintMenuOption("1", _commands["1"].Description);
+        ConsoleHelper.PrintMenuOption("2", _commands["2"].Description);
+        ConsoleHelper.PrintMenuOption("3", _commands["3"].Description);
+        Console.WriteLine();
 
-            ConsoleHelper.PrintSubHeader("Shopping");
-            ConsoleHelper.PrintMenuOption("1", "Browse Products");
-            ConsoleHelper.PrintMenuOption("2", "Search Products");
-            ConsoleHelper.PrintMenuOption("3", "Add Product to Cart");
-            Console.WriteLine();
+        ConsoleHelper.PrintSubHeader("Cart & Checkout");
+        ConsoleHelper.PrintMenuOption("4", _commands["4"].Description);
+        ConsoleHelper.PrintMenuOption("5", _commands["5"].Description);
+        ConsoleHelper.PrintMenuOption("6", _commands["6"].Description);
+        Console.WriteLine();
 
-            ConsoleHelper.PrintSubHeader("Cart & Checkout");
-            ConsoleHelper.PrintMenuOption("4", "View Cart");
-            ConsoleHelper.PrintMenuOption("5", "Update Cart");
-            ConsoleHelper.PrintMenuOption("6", "Checkout");
-            Console.WriteLine();
+        ConsoleHelper.PrintSubHeader("Wallet");
+        ConsoleHelper.PrintMenuOption("7", _commands["7"].Description);
+        ConsoleHelper.PrintMenuOption("8", _commands["8"].Description);
+        Console.WriteLine();
 
-            ConsoleHelper.PrintSubHeader("Wallet");
-            ConsoleHelper.PrintMenuOption("7", "View Wallet Balance");
-            ConsoleHelper.PrintMenuOption("8", "Add Wallet Funds");
-            Console.WriteLine();
+        ConsoleHelper.PrintSubHeader("Orders & Reviews");
+        ConsoleHelper.PrintMenuOption("9", _commands["9"].Description);
+        ConsoleHelper.PrintMenuOption("10", _commands["10"].Description);
+        ConsoleHelper.PrintMenuOption("11", _commands["11"].Description);
+        Console.WriteLine();
+    }
 
-            ConsoleHelper.PrintSubHeader("Orders & Reviews");
-            ConsoleHelper.PrintMenuOption("9", "View Order History");
-            ConsoleHelper.PrintMenuOption("10", "Track Orders");
-            ConsoleHelper.PrintMenuOption("11", "Review Products");
-            Console.WriteLine();
-
-            ConsoleHelper.PrintSeparator();
-            ConsoleHelper.PrintMenuOption("12", "Logout");
-            Console.WriteLine();
-            ConsoleHelper.PrintPrompt("Select an option: ");
-
-            switch (Console.ReadLine()?.Trim())
-            {
-                case "1": BrowseProducts(); break;
-                case "2": SearchProducts(); break;
-                case "3": AddProductToCart(); break;
-                case "4": ViewCart(); break;
-                case "5": UpdateCart(); break;
-                case "6": Checkout(); break;
-                case "7": ViewWalletBalance(); break;
-                case "8": AddWalletFunds(); break;
-                case "9": ViewOrderHistory(); break;
-                case "10": TrackOrders(); break;
-                case "11": ReviewProduct(); break;
-                case "12":
-                    Program.CurrentUser = null;
-                    ConsoleHelper.PrintSuccess("Logged out successfully.");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    return;
-                default:
-                    ConsoleHelper.PrintError("Invalid option. Please try again.");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    break;
-            }
-        }
+    public override void Show()
+    {
+        base.Show();
+        // Logout logic when base.Show returns (input "0")
+        Program.CurrentUser = null;
+        ConsoleHelper.PrintSuccess("Logged out successfully.");
+        Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
     #region Shopping
@@ -259,8 +247,8 @@ public partial class CustomerMenu
         }
 
         Console.WriteLine();
-        ConsoleHelper.PrintInfo($"Wallet Balance: {_customer.Balance:F2}");
-        ConsoleHelper.PrintInfo($"Order Total:    {total:F2}");
+        ConsoleHelper.PrintInfo($"Wallet Balance: R{_customer.Balance:F2}");
+        ConsoleHelper.PrintInfo($"Order Total:    R{total:F2}");
         Console.WriteLine();
         ConsoleHelper.PrintPrompt("Confirm order? (y/n): ");
 
@@ -292,7 +280,7 @@ public partial class CustomerMenu
     {
         Console.Clear();
         ConsoleHelper.PrintHeader("Wallet Balance");
-        ConsoleHelper.PrintInfo($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintInfo($"Current Balance: R{PaymentService.GetBalance(_customer):F2}");
         ConsoleHelper.PressAnyKey();
     }
 
@@ -300,13 +288,13 @@ public partial class CustomerMenu
     {
         Console.Clear();
         ConsoleHelper.PrintHeader("Add Wallet Funds");
-        ConsoleHelper.PrintInfo($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintInfo($"Current Balance: R{PaymentService.GetBalance(_customer):F2}");
         Console.WriteLine();
 
         var amount = ConsoleHelper.ReadPositiveDecimal("  Enter amount to add: ");
 
         _paymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
-        ConsoleHelper.PrintSuccess($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintSuccess($"Funds added successfully. New Balance: R{PaymentService.GetBalance(_customer):F2}");
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 

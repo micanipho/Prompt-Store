@@ -1,3 +1,7 @@
+using Domain.Factories;
+using Domain.Interfaces;
+using Domain.Strategies;
+
 namespace Application.Services;
 
 /// <summary>Handles order placement, retrieval, and status management.</summary>
@@ -7,13 +11,17 @@ public class OrderService
     private readonly IProductRepository _productRepository;
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IOrderFactory _orderFactory;
+    private readonly IDiscountStrategy _discountStrategy;
 
-    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
+    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork, IOrderFactory orderFactory, IDiscountStrategy? discountStrategy = null)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _paymentRepository = paymentRepository;
         _unitOfWork = unitOfWork;
+        _orderFactory = orderFactory;
+        _discountStrategy = discountStrategy ?? new NoDiscountStrategy();
     }
 
     /// <summary>
@@ -25,14 +33,14 @@ public class OrderService
         if (!customer.Cart.Items.Any())
             throw new InvalidOperationException("Cannot place an order with an empty cart.");
 
-        var total = customer.Cart.Items.Sum(item => item.Product.Price * item.Quantity);
+        var subtotal = customer.Cart.Items.Sum(item => item.Product.Price * item.Quantity);
+        var total = _discountStrategy.CalculateTotal(subtotal);
 
         if (customer.Balance < total)
             throw new InvalidOperationException(
-                $"Insufficient wallet balance. Required: {total:F2}, Available: {customer.Balance:F2}.");
+                $"Insufficient wallet balance. Required: R{total:F2} (after {_discountStrategy.Name}), Available: R{customer.Balance:F2}.");
 
-        // Load all products for the cart in a single pass to avoid multiple DB calls per item
-        var products = new Dictionary<int, Product>();
+        // Validate stock for all items before committing
         foreach (var cartItem in customer.Cart.Items)
         {
             var product = _productRepository.GetById(cartItem.Product.Id)
@@ -41,35 +49,17 @@ public class OrderService
             if (cartItem.Quantity > product.Stock)
                 throw new InvalidOperationException(
                     $"Insufficient stock for '{product.Name}'. Available: {product.Stock}, Requested: {cartItem.Quantity}.");
-
-            products[product.Id] = product;
         }
 
-        // Build order items (snapshot of current prices) and deduct stock in a single pass
-        var orderItems = new List<OrderItem>();
+        var order = _orderFactory.CreateOrder(customer, subtotal, _discountStrategy);
+
+        // Deduct stock from each product
         foreach (var cartItem in customer.Cart.Items)
         {
-            var product = products[cartItem.Product.Id];
-
-            orderItems.Add(new OrderItem
-            {
-                Product = product,
-                Quantity = cartItem.Quantity,
-                UnitPrice = product.Price
-            });
-
+            var product = _productRepository.GetById(cartItem.Product.Id)!;
             product.Stock -= cartItem.Quantity;
             _productRepository.Update(product);
         }
-
-        var order = new Order
-        {
-            Items = orderItems,
-            Total = total,
-            Status = OrderStatus.Pending,
-            PlacedAt = DateTime.Now,
-            Customer = customer
-        };
 
         _orderRepository.Add(order);
         customer.OrderHistory.Add(order);

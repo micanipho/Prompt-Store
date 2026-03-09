@@ -1,13 +1,17 @@
+using Domain.Factories;
+
 namespace Application.Services;
 
 /// <summary>Handles user registration and authentication.</summary>
 public class AuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserFactory _userFactory;
 
-    public AuthService(IUserRepository userRepository)
+    public AuthService(IUserRepository userRepository, IUserFactory userFactory)
     {
         _userRepository = userRepository;
+        _userFactory = userFactory;
     }
 
     /// <summary>Registers a new user. Throws if input is empty or username is already taken.</summary>
@@ -19,12 +23,7 @@ public class AuthService
         if (_userRepository.UsernameExists(request.UserName))
             throw new InvalidOperationException("Username already exists.");
 
-        User user = request.Role switch
-        {
-            UserRole.Customer => new Customer(request.UserName, request.Password),
-            UserRole.Admin => new Administrator(request.UserName, request.Password),
-            _ => throw new InvalidOperationException("Invalid user role.")
-        };
+        var user = _userFactory.CreateUser(request.UserName, request.Password, request.Role);
 
         _userRepository.AddUser(user);
     }

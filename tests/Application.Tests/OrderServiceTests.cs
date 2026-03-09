@@ -1,3 +1,6 @@
+using Domain.Factories;
+using Moq;
+
 namespace Application.Tests;
 
 /// <summary>Unit tests for OrderService covering order placement, retrieval, and status management.</summary>
@@ -7,6 +10,8 @@ public class OrderServiceTests
     private readonly Mock<IProductRepository> _productRepositoryMock;
     private readonly Mock<IPaymentRepository> _paymentRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IDiscountStrategy> _discountStrategyMock;
+    private readonly IOrderFactory _orderFactory;
     private readonly OrderService _orderService;
 
     public OrderServiceTests()
@@ -15,7 +20,20 @@ public class OrderServiceTests
         _productRepositoryMock = new Mock<IProductRepository>();
         _paymentRepositoryMock = new Mock<IPaymentRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _paymentRepositoryMock.Object, _unitOfWorkMock.Object);
+        _discountStrategyMock = new Mock<IDiscountStrategy>();
+        _orderFactory = new OrderFactory();
+        
+        // Default mock behavior for strategy
+        _discountStrategyMock.Setup(s => s.CalculateTotal(It.IsAny<decimal>())).Returns<decimal>(d => d);
+        _discountStrategyMock.Setup(s => s.Name).Returns("No Discount");
+
+        _orderService = new OrderService(
+            _orderRepositoryMock.Object, 
+            _productRepositoryMock.Object, 
+            _paymentRepositoryMock.Object, 
+            _unitOfWorkMock.Object, 
+            _orderFactory,
+            _discountStrategyMock.Object);
     }
 
     private static Customer CreateCustomer(decimal balance = 5000m)

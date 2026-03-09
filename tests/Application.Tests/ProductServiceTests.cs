@@ -1,15 +1,20 @@
+using Domain.Factories;
+using Moq;
+
 namespace Application.Tests;
 
 /// <summary>Unit tests for ProductService covering all CRUD operations and input validation.</summary>
 public class ProductServiceTests
 {
     private readonly Mock<IProductRepository> _repositoryMock;
+    private readonly IProductFactory _productFactory;
     private readonly ProductService _productService;
 
     public ProductServiceTests()
     {
         _repositoryMock = new Mock<IProductRepository>();
-        _productService = new ProductService(_repositoryMock.Object);
+        _productFactory = new ProductFactory();
+        _productService = new ProductService(_repositoryMock.Object, _productFactory);
     }
 
     #region AddProduct

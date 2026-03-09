@@ -1,7 +1,7 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the application entry menu with options to register, login, or exit.</summary>
-public class MainMenu
+public class MainMenu : BaseMenu
 {
     private readonly AuthService _authService;
     private readonly ProductService _productService;
@@ -22,45 +22,63 @@ public class MainMenu
         _reportService = reportService;
         _reviewService = reviewService;
         _paymentService = paymentService;
+
+        // Register Commands
+        AddCommand("1", "Login", ShowLogin);
+        AddCommand("2", "Register", ShowRegister);
     }
 
-    /// <summary>Displays the main menu in a loop until the user exits the application.</summary>
-    public void Show()
+    protected override string Header => "Main Menu";
+
+    protected override void PrintMenuContent()
+    {
+        ConsoleHelper.PrintBanner();
+        ConsoleHelper.PrintMenuOption("1", _commands["1"].Description);
+        ConsoleHelper.PrintMenuOption("2", _commands["2"].Description);
+    }
+
+    public override void Show()
     {
         while (true)
         {
             Console.Clear();
-            ConsoleHelper.PrintBanner();
-            ConsoleHelper.PrintHeader("Main Menu");
+            ConsoleHelper.PrintHeader($"{Header}");
 
-            ConsoleHelper.PrintMenuOption("1", "Login");
-            ConsoleHelper.PrintMenuOption("2", "Register");
-            ConsoleHelper.PrintMenuOption("3", "Exit");
+            PrintMenuContent();
+
+            ConsoleHelper.PrintSeparator();
+            ConsoleHelper.PrintMenuOption("0", "Exit");
             Console.WriteLine();
             ConsoleHelper.PrintPrompt("Select an option: ");
 
-            var choice = Console.ReadLine()?.Trim();
-
-            switch (choice)
+            var input = Console.ReadLine()?.Trim();
+            if (input == "0")
             {
-                case "1":
-                    var loginMenu = new LoginMenu(_authService, _productService, _cartService, _orderService, _inventoryService, _reportService, _reviewService, _paymentService);
-                    loginMenu.Show();
-                    break;
-                case "2":
-                    var registerMenu = new RegisterMenu(_authService);
-                    registerMenu.Show();
-                    break;
-                case "3":
-                    Console.WriteLine();
-                    ConsoleHelper.PrintSuccess("Thank you for visiting the Prompt Store. Goodbye!");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    return;
-                default:
-                    ConsoleHelper.PrintError("Invalid option. Please try again.");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    break;
+                Console.WriteLine();
+                ConsoleHelper.PrintSuccess("Thank you for visiting the Prompt Store. Goodbye!");
+                Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
+                return;
+            }
+
+            if (_commands.TryGetValue(input ?? string.Empty, out var command))
+            {
+                command.Execute();
+            }
+            else
+            {
+                ConsoleHelper.PrintError("Invalid option. Please try again.");
+                Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             }
         }
+    }
+
+    private void ShowLogin()
+    {
+        new LoginMenu(_authService, _productService, _cartService, _orderService, _inventoryService, _reportService, _reviewService, _paymentService).Show();
+    }
+
+    private void ShowRegister()
+    {
+        new RegisterMenu(_authService).Show();
     }
 }

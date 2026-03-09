@@ -1,66 +1,62 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the administrator menu with product, order, inventory, and reporting options.</summary>
-public class AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService, ReportService reportService)
+public class AdminMenu : BaseMenu
 {
-    private readonly ProductService _productService = productService;
-    private readonly OrderService _orderService = orderService;
-    private readonly InventoryService _inventoryService = inventoryService;
-    private readonly ReportService _reportService = reportService;
+    private readonly ProductService _productService;
+    private readonly OrderService _orderService;
+    private readonly InventoryService _inventoryService;
+    private readonly ReportService _reportService;
 
-    /// <summary>Displays the administrator menu in a loop until the user logs out.</summary>
-    public void Show()
+    public AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService, ReportService reportService)
     {
-        while (true)
-        {
-            Console.Clear();
-            ConsoleHelper.PrintHeader($"Administrator Menu \u2502 {Program.CurrentUser?.UserName}");
+        _productService = productService;
+        _orderService = orderService;
+        _inventoryService = inventoryService;
+        _reportService = reportService;
 
-            ConsoleHelper.PrintSubHeader("Product Management");
-            ConsoleHelper.PrintMenuOption("1", "Add Product");
-            ConsoleHelper.PrintMenuOption("2", "Update Product");
-            ConsoleHelper.PrintMenuOption("3", "Delete Product");
-            ConsoleHelper.PrintMenuOption("4", "Restock Product");
-            ConsoleHelper.PrintMenuOption("5", "View Products");
-            ConsoleHelper.PrintMenuOption("6", "View Low Stock Products");
-            Console.WriteLine();
+        // Register Commands
+        AddCommand("1", "Add Product", AddProduct);
+        AddCommand("2", "Update Product", UpdateProduct);
+        AddCommand("3", "Delete Product", DeleteProduct);
+        AddCommand("4", "Restock Product", RestockProduct);
+        AddCommand("5", "View Products", ViewProducts);
+        AddCommand("6", "View Low Stock Products", ViewLowStockProducts);
+        AddCommand("7", "View Orders", ViewOrders);
+        AddCommand("8", "Update Order Status", UpdateOrderStatus);
+        AddCommand("9", "Generate Sales Reports", GenerateSalesReport);
+    }
 
-            ConsoleHelper.PrintSubHeader("Order Management");
-            ConsoleHelper.PrintMenuOption("7", "View Orders");
-            ConsoleHelper.PrintMenuOption("8", "Update Order Status");
-            Console.WriteLine();
+    protected override string Header => "Administrator Menu";
 
-            ConsoleHelper.PrintSubHeader("Analytics");
-            ConsoleHelper.PrintMenuOption("9", "Generate Sales Reports");
-            Console.WriteLine();
+    protected override void PrintMenuContent()
+    {
+        ConsoleHelper.PrintSubHeader("Product Management");
+        ConsoleHelper.PrintMenuOption("1", _commands["1"].Description);
+        ConsoleHelper.PrintMenuOption("2", _commands["2"].Description);
+        ConsoleHelper.PrintMenuOption("3", _commands["3"].Description);
+        ConsoleHelper.PrintMenuOption("4", _commands["4"].Description);
+        ConsoleHelper.PrintMenuOption("5", _commands["5"].Description);
+        ConsoleHelper.PrintMenuOption("6", _commands["6"].Description);
+        Console.WriteLine();
 
-            ConsoleHelper.PrintSeparator();
-            ConsoleHelper.PrintMenuOption("10", "Logout");
-            Console.WriteLine();
-            ConsoleHelper.PrintPrompt("Select an option: ");
+        ConsoleHelper.PrintSubHeader("Order Management");
+        ConsoleHelper.PrintMenuOption("7", _commands["7"].Description);
+        ConsoleHelper.PrintMenuOption("8", _commands["8"].Description);
+        Console.WriteLine();
 
-            switch (Console.ReadLine()?.Trim())
-            {
-                case "1": AddProduct(); break;
-                case "2": UpdateProduct(); break;
-                case "3": DeleteProduct(); break;
-                case "4": RestockProduct(); break;
-                case "5": ViewProducts(); break;
-                case "6": ViewLowStockProducts(); break;
-                case "7": ViewOrders(); break;
-                case "8": UpdateOrderStatus(); break;
-                case "9": GenerateSalesReport(); break;
-                case "10":
-                    Program.CurrentUser = null;
-                    ConsoleHelper.PrintSuccess("Logged out successfully.");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    return;
-                default:
-                    ConsoleHelper.PrintError("Invalid option. Please try again.");
-                    Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-                    break;
-            }
-        }
+        ConsoleHelper.PrintSubHeader("Analytics");
+        ConsoleHelper.PrintMenuOption("9", _commands["9"].Description);
+        Console.WriteLine();
+    }
+
+    public override void Show()
+    {
+        base.Show();
+        // Logout logic when base.Show returns (input "0")
+        Program.CurrentUser = null;
+        ConsoleHelper.PrintSuccess("Logged out successfully.");
+        Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
     private void AddProduct()
@@ -130,7 +126,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
             var category = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(category)) category = existing.Category;
 
-            Console.Write($"  Price [{existing.Price:F2}]: ");
+            Console.Write($"  Price [R{existing.Price:F2}]: ");
             var priceInput = Console.ReadLine()?.Trim();
             decimal price;
             if (string.IsNullOrWhiteSpace(priceInput))
