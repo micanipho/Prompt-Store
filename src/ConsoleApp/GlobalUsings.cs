@@ -8,4 +8,5 @@ global using Application.Dtos;
 global using Application.Interfaces;
 global using Infrastructure.Data;
 global using Infrastructure.Repositories;
+global using Infrastructure.Services;
 global using ConsoleApp.Menus;

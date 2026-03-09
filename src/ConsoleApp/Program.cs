@@ -74,7 +74,7 @@ public class Program
         services.AddScoped<IReviewRepository, EfReviewRepository>();
 
         // Application Services
-        services.AddScoped<IPdfGenerator, Infrastructure.Services.QuestPdfGenerator>();
+        services.AddScoped<IPdfGenerator, QuestPdfGenerator>();
         services.AddScoped<IUserFactory, UserFactory>();
         services.AddScoped<IOrderFactory, OrderFactory>();
         services.AddScoped<IProductFactory, ProductFactory>();
@@ -87,6 +87,14 @@ public class Program
         services.AddScoped<InventoryService>();
         services.AddScoped<ReportService>();
         services.AddScoped<ReviewService>();
+
+        // AI Shopping Assistant – uses Claude if an API key is configured, otherwise falls back to rule-based logic
+        var claudeApiKey = configuration["Claude:ApiKey"];
+        if (string.IsNullOrWhiteSpace(claudeApiKey))
+            services.AddScoped<IShoppingAssistant, FallbackShoppingAssistant>();
+        else
+            services.AddScoped<IShoppingAssistant>(_ => new ClaudeShoppingAssistant(claudeApiKey));
+        services.AddScoped<ShoppingAssistantService>();
 
         // Presentation
         services.AddScoped<MainMenu>();
