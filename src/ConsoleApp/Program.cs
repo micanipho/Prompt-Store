@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Domain.Factories;
 
 namespace ConsoleApp;
 
@@ -14,51 +16,74 @@ public class Program
     /// <summary>Initialises all dependencies and starts the console application.</summary>
     public static void Main(string[] args)
     {
-        var configuration = new ConfigurationBuilder()
+        var configuration = BuildConfiguration();
+        var serviceProvider = ConfigureServices(configuration);
+
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ShoppingDbContext>();
+            DatabaseSeeder.Seed(context);
+
+            var mainMenu = scope.ServiceProvider.GetRequiredService<MainMenu>();
+
+            try
+            {
+                mainMenu.Show();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nAn unexpected error occurred. The application will now exit.");
+                Console.WriteLine($"Details: {ex.Message}");
+                Console.ResetColor();
+                Console.WriteLine("Press any key to exit.");
+                Console.ReadKey();
+            }
+        }
+    }
+
+    private static IConfiguration BuildConfiguration()
+    {
+        return new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.Development.json", optional: false)
+            .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production"}.json", optional: true)
             .Build();
+    }
 
+    private static IServiceProvider ConfigureServices(IConfiguration configuration)
+    {
+        var services = new ServiceCollection();
+
+        // Database
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
-        var options = new DbContextOptionsBuilder<ShoppingDbContext>()
-            .UseSqlServer(connectionString)
-            .Options;
+        services.AddDbContext<ShoppingDbContext>(options =>
+            options.UseSqlServer(connectionString));
 
-        using var context = new ShoppingDbContext(options);
+        // Infrastructure
+        services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+        services.AddScoped<IUserRepository, EfUserRepository>();
+        services.AddScoped<IProductRepository, EfProductRepository>();
+        services.AddScoped<IOrderRepository, EfOrderRepository>();
+        services.AddScoped<IPaymentRepository, EfPaymentRepository>();
+        services.AddScoped<IReviewRepository, EfReviewRepository>();
 
-        DatabaseSeeder.Seed(context);
+        // Application Services
+        services.AddScoped<IUserFactory, UserFactory>();
+        services.AddScoped<AuthService>();
+        services.AddScoped<ProductService>();
+        services.AddScoped<CartService>();
+        services.AddScoped<OrderService>();
+        services.AddScoped<PaymentService>();
+        services.AddScoped<InventoryService>();
+        services.AddScoped<ReportService>();
+        services.AddScoped<ReviewService>();
 
-        IUnitOfWork unitOfWork = new EfUnitOfWork(context);
-        var userRepository = new EfUserRepository(context);
-        var productRepository = new EfProductRepository(context);
-        var orderRepository = new EfOrderRepository(context);
-        var paymentRepository = new EfPaymentRepository(context);
-        var reviewRepository = new EfReviewRepository(context);
-        var authService = new AuthService(userRepository);
-        var productService = new ProductService(productRepository);
-        var cartService = new CartService(productRepository, unitOfWork);
-        var orderService = new OrderService(orderRepository, productRepository, paymentRepository, unitOfWork);
-        var paymentService = new PaymentService(paymentRepository, unitOfWork);
-        var inventoryService = new InventoryService(productRepository);
-        var reportService = new ReportService(orderRepository, paymentRepository);
-        var reviewService = new ReviewService(reviewRepository, productRepository);
-        var mainMenu = new MainMenu(authService, productService, cartService, orderService, inventoryService, reportService, reviewService, paymentService);
+        // Presentation
+        services.AddScoped<MainMenu>();
 
-        try
-        {
-            mainMenu.Show();
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\nAn unexpected error occurred. The application will now exit.");
-            Console.WriteLine($"Details: {ex.Message}");
-            Console.ResetColor();
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
-        }
+        return services.BuildServiceProvider();
     }
 }

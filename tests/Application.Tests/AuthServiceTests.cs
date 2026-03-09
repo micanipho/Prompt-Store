@@ -3,6 +3,7 @@ using Application.Dtos;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Interfaces;
+using Domain.Factories;
 using Moq;
 
 namespace Application.Tests;
@@ -11,12 +12,14 @@ namespace Application.Tests;
 public class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _repositoryMock;
+    private readonly IUserFactory _userFactory;
     private readonly AuthService _authService;
 
     public AuthServiceTests()
     {
         _repositoryMock = new Mock<IUserRepository>();
-        _authService = new AuthService(_repositoryMock.Object);
+        _userFactory = new UserFactory();
+        _authService = new AuthService(_repositoryMock.Object, _userFactory);
     }
 
     #region Register
