@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet add package Microsoft.EntityFrameworkCore.SqlServer)",
+      "Bash(dotnet add package Microsoft.EntityFrameworkCore.Tools)",
+      "Bash(dotnet add package Microsoft.EntityFrameworkCore.Design)",
+      "Bash(dotnet add package Microsoft.Extensions.Configuration.Json)",
+      "Bash(dotnet add package Microsoft.EntityFrameworkCore.InMemory)",
+      "Bash(dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-project src/ConsoleApp --output-dir Data/Migrations)",
+      "Bash(dotnet tool install --global dotnet-ef)",
+      "Bash(sqllocaldb info)",
+      "Bash(sqlcmd -?)",
+      "Bash(sqllocaldb info MSSQLLocalDB)",
+      "Bash(sqllocaldb create MSSQLLocalDB)",
+      "Bash(sqllocaldb start MSSQLLocalDB)",
+      "Bash(dotnet ef database update --project src/Infrastructure --startup-project src/ConsoleApp)",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d OnlineShoppingDb -Q \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME;\")",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d OnlineShoppingDb -Q \"SELECT Id, UserName, Role FROM Users; SELECT Id, Name, Price, Stock, Category FROM Products;\")",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d OnlineShoppingDb -Q \":*)",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d OnlineShoppingDb -Q \"DELETE FROM Products; DELETE FROM Users;\")",
+      "Bash(sqlcmd -S \"\\(localdb\\)\\\\MSSQLLocalDB\" -d OnlineShoppingDb -Q \"SET QUOTED_IDENTIFIER ON; DELETE FROM Products; DELETE FROM Users;\")",
+      "Bash(powershell -Command \"Get-Service -Name ''MSSQL*'' 2>$null | Select-Object Name, Status, DisplayName | Format-Table -AutoSize\")",
+      "Bash(powershell -Command \"Get-Service -Name ''MSSQL*'' -ErrorAction SilentlyContinue | Select-Object Name, Status, DisplayName | Format-Table -AutoSize\")",
+      "Bash(sqlcmd -S . -d OnlineShoppingDb -Q \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=''BASE TABLE'' ORDER BY TABLE_NAME;\")",
+      "Bash(docker ps -a --filter \"ancestor=mcr.microsoft.com/mssql/server\" --format \"table {{.ID}}\\\\t{{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}\")",
+      "Bash(docker ps -a --format \"table {{.ID}}\\\\t{{.Names}}\\\\t{{.Image}}\\\\t{{.Status}}\\\\t{{.Ports}}\")",
+      "Bash(docker start SQL_Server_Docker)",
+      "Bash(docker ps --filter \"name=SQL_Server_Docker\" --format \"table {{.Status}}\\\\t{{.Ports}}\")",
+      "Bash(docker exec SQL_Server_Docker env)",
+      "Bash(docker exec SQL_Server_Docker /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"@123Shesha\" -C -d OnlineShoppingDb -Q \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=''BASE TABLE'' ORDER BY TABLE_NAME;\")",
+      "Bash(sqlcmd -S localhost,1433 -U sa -P \"@123Shesha\" -C -d OnlineShoppingDb -Q \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=''BASE TABLE'' ORDER BY TABLE_NAME;\")",
+      "Bash(powershell -Command \"Get-Service -Name ''MSSQLSERVER'' -ErrorAction SilentlyContinue | Select-Object Name, Status\")",
+      "Bash(powershell -Command \"Stop-Service -Name ''MSSQLSERVER'' -Force; Set-Service -Name ''MSSQLSERVER'' -StartupType Disabled; Get-Service -Name ''MSSQLSERVER'' | Select-Object Name, Status, StartType\")",
+      "Bash(powershell -Command \"Get-Service -Name ''MSSQLSERVER'' | Select-Object Name, Status, StartType\")",
+      "Bash(docker restart SQL_Server_Docker)",
+      "Bash(docker ps --filter \"name=SQL_Server_Docker\" --format \"{{.Status}}\\\\t{{.Ports}}\")",
+      "Bash(sqlcmd -S localhost,1433 -U sa -P \"@123Shesha\" -C -Q \"SELECT @@VERSION;\")"
+    ]
+  }
+}

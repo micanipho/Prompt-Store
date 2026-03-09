@@ -8,14 +8,16 @@ public class CustomerMenu
     private readonly CartService _cartService;
     private readonly OrderService _orderService;
     private readonly ReviewService _reviewService;
+    private readonly PaymentService _paymentService;
 
-    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, ReviewService reviewService)
+    public CustomerMenu(Customer customer, ProductService productService, CartService cartService, OrderService orderService, ReviewService reviewService, PaymentService paymentService)
     {
         _customer = customer;
         _productService = productService;
         _cartService = cartService;
         _orderService = orderService;
         _reviewService = reviewService;
+        _paymentService = paymentService;
     }
 
     /// <summary>Displays the customer menu in a loop until the user logs out.</summary>
@@ -314,7 +316,7 @@ public class CustomerMenu
 
         var amount = ConsoleHelper.ReadPositiveDecimal("  Enter amount to add: ");
 
-        PaymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
+        _paymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
         ConsoleHelper.PrintSuccess($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }

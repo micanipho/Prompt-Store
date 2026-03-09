@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 namespace ConsoleApp;
 
 /// <summary>Application entry point that wires up repositories, services, and launches the main menu.</summary>
@@ -11,19 +14,38 @@ public class Program
     /// <summary>Initialises all dependencies and starts the console application.</summary>
     public static void Main(string[] args)
     {
-        var userRepository = new InMemoryUserRepository();
-        var productRepository = new InMemoryProductRepository();
-        var orderRepository = new InMemoryOrderRepository();
-        var paymentRepository = new InMemoryPaymentRepository();
-        var reviewRepository = new InMemoryReviewRepository();
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.Development.json", optional: false)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production"}.json", optional: true)
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+
+        var options = new DbContextOptionsBuilder<ShoppingDbContext>()
+            .UseSqlServer(connectionString)
+            .Options;
+
+        using var context = new ShoppingDbContext(options);
+
+        DatabaseSeeder.Seed(context);
+
+        IUnitOfWork unitOfWork = new EfUnitOfWork(context);
+        var userRepository = new EfUserRepository(context);
+        var productRepository = new EfProductRepository(context);
+        var orderRepository = new EfOrderRepository(context);
+        var paymentRepository = new EfPaymentRepository(context);
+        var reviewRepository = new EfReviewRepository(context);
         var authService = new AuthService(userRepository);
         var productService = new ProductService(productRepository);
-        var cartService = new CartService(productRepository);
-        var orderService = new OrderService(orderRepository, productRepository, paymentRepository);
+        var cartService = new CartService(productRepository, unitOfWork);
+        var orderService = new OrderService(orderRepository, productRepository, paymentRepository, unitOfWork);
+        var paymentService = new PaymentService(paymentRepository, unitOfWork);
         var inventoryService = new InventoryService(productRepository);
         var reportService = new ReportService(orderRepository, paymentRepository);
         var reviewService = new ReviewService(reviewRepository, productRepository);
-        var mainMenu = new MainMenu(authService, productService, cartService, orderService, inventoryService, reportService, reviewService);
+        var mainMenu = new MainMenu(authService, productService, cartService, orderService, inventoryService, reportService, reviewService, paymentService);
 
         try
         {

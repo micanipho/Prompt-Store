@@ -4,7 +4,22 @@
       "Bash(dotnet restore)",
       "Bash(dotnet new gitignore)",
       "Bash(dotnet build)",
-      "Bash(dotnet test)"
+      "Bash(dotnet test)",
+      "Bash(dotnet add package Ardalis.GuardClauses)",
+      "Bash(dotnet build --no-incremental -v q)",
+      "Bash(dotnet test --verbosity normal)",
+      "Bash(dotnet test -v q)",
+      "Bash(python3 -c \":*)",
+      "Bash(powershell -Command \"Get-Content ''c:/Users/Nhlakanipho/Documents/Projects/Prompt Store/src/ConsoleApp/Menus/CustomerMenu.cs'' | Measure-Object -Line\")",
+      "Bash(dotnet build --no-restore)",
+      "Bash(dotnet test tests/Application.Tests --no-build)",
+      "Bash(cd /c/Users/Nhlakanipho/Documents/Projects/\"Prompt Store\")",
+      "Bash(dotnet build --nologo -v q)",
+      "Bash(dotnet test --nologo -v q)",
+      "Bash(dotnet build src/ConsoleApp/ConsoleApp.csproj --no-dependencies)",
+      "Bash(dotnet test --no-build tests/Application.Tests)",
+      "Bash(dotnet build --nologo)",
+      "Bash(dotnet test --nologo)"
     ]
   }
 }

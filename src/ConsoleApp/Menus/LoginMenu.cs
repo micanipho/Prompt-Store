@@ -10,8 +10,9 @@ public class LoginMenu
     private readonly InventoryService _inventoryService;
     private readonly ReportService _reportService;
     private readonly ReviewService _reviewService;
+    private readonly PaymentService _paymentService;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService, PaymentService paymentService)
     {
         _authService = authService;
         _productService = productService;
@@ -20,6 +21,7 @@ public class LoginMenu
         _inventoryService = inventoryService;
         _reportService = reportService;
         _reviewService = reviewService;
+        _paymentService = paymentService;
     }
 
     /// <summary>Prompts for credentials, authenticates the user, and opens the role-specific menu.</summary>
@@ -53,7 +55,7 @@ public class LoginMenu
             }
             else
             {
-                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _reviewService).Show();
+                new CustomerMenu((Customer)user, _productService, _cartService, _orderService, _reviewService, _paymentService).Show();
             }
         }
         catch (Exception ex)

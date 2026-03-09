@@ -6,12 +6,14 @@ public class OrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
     private readonly IPaymentRepository _paymentRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IPaymentRepository paymentRepository)
+    public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _paymentRepository = paymentRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -61,7 +63,8 @@ public class OrderService
             Items = orderItems,
             Total = total,
             Status = OrderStatus.Pending,
-            PlacedAt = DateTime.Now
+            PlacedAt = DateTime.Now,
+            Customer = customer
         };
 
         _orderRepository.Add(order);
@@ -77,6 +80,8 @@ public class OrderService
             PaidAt = DateTime.Now
         };
         _paymentRepository.Add(payment);
+
+        _unitOfWork.SaveChanges();
 
         return order;
     }
@@ -101,5 +106,6 @@ public class OrderService
             ?? throw new InvalidOperationException($"Order with ID {request.OrderId} not found.");
 
         order.Status = request.NewStatus;
+        _unitOfWork.SaveChanges();
     }
 }

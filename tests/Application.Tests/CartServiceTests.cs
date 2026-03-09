@@ -4,12 +4,14 @@ namespace Application.Tests;
 public class CartServiceTests
 {
     private readonly Mock<IProductRepository> _repositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly CartService _cartService;
 
     public CartServiceTests()
     {
         _repositoryMock = new Mock<IProductRepository>();
-        _cartService = new CartService(_repositoryMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _cartService = new CartService(_repositoryMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Customer CreateCustomer() => new("testuser", "password");

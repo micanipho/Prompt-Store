@@ -4,12 +4,14 @@ namespace Application.Tests;
 public class PaymentServiceTests
 {
     private readonly Mock<IPaymentRepository> _paymentRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly PaymentService _paymentService;
 
     public PaymentServiceTests()
     {
         _paymentRepositoryMock = new Mock<IPaymentRepository>();
-        _paymentService = new PaymentService(_paymentRepositoryMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _paymentService = new PaymentService(_paymentRepositoryMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Customer CreateCustomer(decimal balance = 0m)
@@ -50,7 +52,7 @@ public class PaymentServiceTests
     {
         var customer = CreateCustomer();
 
-        PaymentService.AddFunds(customer, new AddFundsRequest { Amount = 100m });
+        _paymentService.AddFunds(customer, new AddFundsRequest { Amount = 100m });
 
         Assert.Equal(100m, customer.Balance);
     }
@@ -60,8 +62,8 @@ public class PaymentServiceTests
     {
         var customer = CreateCustomer();
 
-        PaymentService.AddFunds(customer, new AddFundsRequest { Amount = 100m });
-        PaymentService.AddFunds(customer, new AddFundsRequest { Amount = 250m });
+        _paymentService.AddFunds(customer, new AddFundsRequest { Amount = 100m });
+        _paymentService.AddFunds(customer, new AddFundsRequest { Amount = 250m });
 
         Assert.Equal(350m, customer.Balance);
     }
@@ -72,7 +74,7 @@ public class PaymentServiceTests
         var customer = CreateCustomer();
 
         Assert.ThrowsAny<Exception>(() =>
-            PaymentService.AddFunds(customer, new AddFundsRequest { Amount = 0m }));
+            _paymentService.AddFunds(customer, new AddFundsRequest { Amount = 0m }));
     }
 
     [Fact]
@@ -81,7 +83,7 @@ public class PaymentServiceTests
         var customer = CreateCustomer();
 
         Assert.ThrowsAny<Exception>(() =>
-            PaymentService.AddFunds(customer, new AddFundsRequest { Amount = -50m }));
+            _paymentService.AddFunds(customer, new AddFundsRequest { Amount = -50m }));
     }
 
     #endregion

@@ -3,20 +3,22 @@ namespace Domain.Entities;
 /// <summary>Represents a customer who can browse products, place orders, and manage their wallet.</summary>
 public class Customer : User
 {
-    public decimal Balance { get; private set; }
-    public List<Order> OrderHistory { get; private set; }
-    public Cart Cart { get; private set; }
+    public virtual decimal Balance { get; protected set; }
+    public virtual IList<Order> OrderHistory { get; protected set; } = new List<Order>();
+    public virtual Cart Cart { get; protected set; } = new Cart();
+
+    protected Customer() { }
 
     public Customer(string userName, string password)
         : base(userName, UserRole.Customer, password)
     {
         Balance = 0;
-        OrderHistory = [];
+        OrderHistory = new List<Order>();
         Cart = new Cart();
     }
 
     /// <summary>Adds funds to the customer's wallet balance.</summary>
-    public void AddFunds(decimal amount)
+    public virtual void AddFunds(decimal amount)
     {
         if (amount <= 0)
             throw new ArgumentException("Amount must be greater than zero.");
@@ -24,7 +26,7 @@ public class Customer : User
     }
 
     /// <summary>Deducts funds from the customer's wallet balance.</summary>
-    public void DeductFunds(decimal amount)
+    public virtual void DeductFunds(decimal amount)
     {
         if (amount <= 0)
             throw new ArgumentException("Amount must be greater than zero.");
