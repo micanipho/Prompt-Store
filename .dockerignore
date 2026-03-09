@@ -1,0 +1,27 @@
+# Version control
+.git
+.gitignore
+
+# IDE / editor artefacts
+.vs
+.idea
+*.user
+*.suo
+*.userprefs
+
+# Build outputs (already excluded by .gitignore but explicit here for clarity)
+**/bin/
+**/obj/
+
+# Test results
+**/*.trx
+**/TestResults/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Secrets / local overrides (never bake these into the image)
+**/appsettings.Development.json
+**/*.env
+*.env
