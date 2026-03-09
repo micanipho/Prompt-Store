@@ -4,10 +4,12 @@ namespace Application.Services;
 public class CartService
 {
     private readonly IProductRepository _productRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CartService(IProductRepository productRepository)
+    public CartService(IProductRepository productRepository, IUnitOfWork unitOfWork)
     {
         _productRepository = productRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>Adds a product to the customer's cart. Increments quantity if the product is already in the cart.</summary>
@@ -33,9 +35,12 @@ public class CartService
             customer.Cart.Items.Add(new CartItem
             {
                 Product = product,
-                Quantity = request.Quantity
+                Quantity = request.Quantity,
+                Cart = customer.Cart
             });
         }
+
+        _unitOfWork.SaveChanges();
     }
 
     /// <summary>Updates the quantity of a cart item. Set NewQuantity to 0 to remove the item.</summary>
@@ -50,6 +55,7 @@ public class CartService
         if (request.NewQuantity == 0)
         {
             customer.Cart.Items.Remove(cartItem);
+            _unitOfWork.SaveChanges();
             return;
         }
 
@@ -60,6 +66,7 @@ public class CartService
             throw new InvalidOperationException($"Insufficient stock. Available: {product.Stock}, Requested: {request.NewQuantity}.");
 
         cartItem.Quantity = request.NewQuantity;
+        _unitOfWork.SaveChanges();
     }
 
     /// <summary>Removes a product from the customer's cart.</summary>
@@ -69,6 +76,7 @@ public class CartService
             ?? throw new InvalidOperationException("Product not found in cart.");
 
         customer.Cart.Items.Remove(cartItem);
+        _unitOfWork.SaveChanges();
     }
 
     /// <summary>Returns all items in the customer's cart.</summary>
@@ -79,5 +87,9 @@ public class CartService
         customer.Cart.Items.Sum(item => item.Product.Price * item.Quantity);
 
     /// <summary>Removes all items from the customer's cart.</summary>
-    public void ClearCart(Customer customer) => customer.Cart.Items.Clear();
+    public void ClearCart(Customer customer)
+    {
+        customer.Cart.Items.Clear();
+        _unitOfWork.SaveChanges();
+    }
 }

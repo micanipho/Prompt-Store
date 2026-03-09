@@ -3,16 +3,15 @@ namespace Domain.Entities;
 /// <summary>Base class for all users. Provides shared identity and authentication properties.</summary>
 public abstract class User
 {
-    private static int _nextId = 0;
+    public virtual int Id { get; protected set; }
+    public virtual string UserName { get; protected set; } = string.Empty;
+    public virtual UserRole Role { get; protected set; }
+    public virtual string Password { get; protected set; } = string.Empty;
 
-    public int Id { get; private set; }
-    public string UserName { get; protected set; }
-    public UserRole Role { get; protected set; }
-    public string Password { get; protected set; }
+    protected User() { }
 
-    public User(string userName, UserRole role, string password)
+    protected User(string userName, UserRole role, string password)
     {
-        Id = _nextId++;
         UserName = userName;
         Role = role;
         Password = password;

@@ -6,6 +6,7 @@ public class OrderServiceTests
     private readonly Mock<IOrderRepository> _orderRepositoryMock;
     private readonly Mock<IProductRepository> _productRepositoryMock;
     private readonly Mock<IPaymentRepository> _paymentRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly OrderService _orderService;
 
     public OrderServiceTests()
@@ -13,7 +14,8 @@ public class OrderServiceTests
         _orderRepositoryMock = new Mock<IOrderRepository>();
         _productRepositoryMock = new Mock<IProductRepository>();
         _paymentRepositoryMock = new Mock<IPaymentRepository>();
-        _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _paymentRepositoryMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _orderService = new OrderService(_orderRepositoryMock.Object, _productRepositoryMock.Object, _paymentRepositoryMock.Object, _unitOfWorkMock.Object);
     }
 
     private static Customer CreateCustomer(decimal balance = 5000m)
