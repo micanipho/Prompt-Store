@@ -35,15 +35,6 @@ dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj
 
 ---
 
-## 📅 Submissions
-
-| Submission | Focus | Due Date |
-|---|---|---|
-| **Submission 1** | Core backend functionality & OOP | 9 March 2026 – 12:00 PM |
-| **Submission 2** | Design Patterns & Clean Architecture | 9 March 2026 – 5:00 PM |
-
----
-
 ## ✨ Features
 
 ### Customer Features
@@ -80,13 +71,6 @@ The system follows **Clean Architecture** principles, ensuring a clear separatio
 - **Patterns:** Repository, Unit of Work, Dependency Injection, Data Transfer Objects (DTOs)
 - **Querying:** LINQ for efficient data processing
 - **Testing:** xUnit with Moq and FluentAssertions
-
----
-
-## 📜 Documentation & Guidelines
-- [RULES.md](RULES.md) – Coding standards and naming conventions.
-- [TESTING.md](TESTING.md) – Testing strategy and guidelines.
-- [CLAUDE.md](CLAUDE.md) – Build, test, and development workflow.
 
 ---
 *Developed for the Online Shopping Backend System Project.*
