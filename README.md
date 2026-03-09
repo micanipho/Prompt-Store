@@ -4,7 +4,7 @@ A robust backend simulation of an e-commerce platform built with C# and .NET 10.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
@@ -35,7 +35,7 @@ dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj
 
 ---
 
-## ✨ Features
+## Features
 
 ### Customer Features
 - **Account Management:** Secure registration and login.
@@ -54,7 +54,7 @@ dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 The system follows **Clean Architecture** principles, ensuring a clear separation of concerns:
 
@@ -65,7 +65,7 @@ The system follows **Clean Architecture** principles, ensuring a clear separatio
 
 ---
 
-## 🛠️ Technical Stack
+## Technical Stack
 - **Framework:** .NET 10
 - **Persistence:** Entity Framework Core (SQL Server)
 - **Patterns:** Repository, Unit of Work, Dependency Injection, Data Transfer Objects (DTOs)

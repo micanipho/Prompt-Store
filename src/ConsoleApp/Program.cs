@@ -50,6 +50,7 @@ public class Program
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Development"}.json", optional: true)
+            .AddEnvironmentVariables()  // Allows ConnectionStrings__DefaultConnection to be injected at runtime (e.g. from Docker)
             .Build();
     }
 
