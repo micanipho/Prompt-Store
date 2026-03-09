@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Factories;
+using Domain.Interfaces;
+using Domain.Strategies;
 
 namespace ConsoleApp;
 
@@ -74,6 +76,7 @@ public class Program
         services.AddScoped<IUserFactory, UserFactory>();
         services.AddScoped<IOrderFactory, OrderFactory>();
         services.AddScoped<IProductFactory, ProductFactory>();
+        services.AddScoped<IDiscountStrategy>(sp => new PercentageDiscountStrategy("Submission 2 Special (10% Off)", 0.10m));
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<CartService>();

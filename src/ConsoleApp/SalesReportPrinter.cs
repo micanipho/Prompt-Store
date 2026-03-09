@@ -63,8 +63,8 @@ internal static class SalesReportPrinter
     {
         ConsoleHelper.PrintSubHeader("Overview");
         Console.WriteLine($"    Total Orders:         {totalOrders}");
-        Console.WriteLine($"    Total Revenue:        {totalRevenue:F2}");
-        Console.WriteLine($"    Average Order Value:  {averageOrderValue:F2}");
+        Console.WriteLine($"    Total Revenue:        R{totalRevenue:F2}");
+        Console.WriteLine($"    Average Order Value:  R{averageOrderValue:F2}");
         Console.WriteLine();
     }
 
@@ -78,7 +78,7 @@ internal static class SalesReportPrinter
             ConsoleHelper.PrintTableRow(StatusTableWidth, $"{"Status",-15} {"Count",8} {"Revenue",12}");
             ConsoleHelper.PrintTableMid(StatusTableWidth);
             foreach (var status in statusList)
-                ConsoleHelper.PrintTableRow(StatusTableWidth, $"{status.Status,-15} {status.Count,8} {status.Total,12:F2}");
+                ConsoleHelper.PrintTableRow(StatusTableWidth, $"{status.Status,-15} {status.Count,8} R{status.Total,12:F2}");
             ConsoleHelper.PrintTableBot(StatusTableWidth);
         }
         else
@@ -98,7 +98,7 @@ internal static class SalesReportPrinter
             ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{"ID",-5} {"Product",-25} {"Qty Sold",10} {"Revenue",12}");
             ConsoleHelper.PrintTableMid(TopProductsTableWidth);
             foreach (var product in productList)
-                ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{product.ProductId,-5} {product.ProductName,-25} {product.TotalQuantitySold,10} {product.TotalRevenue,12:F2}");
+                ConsoleHelper.PrintTableRow(TopProductsTableWidth, $"{product.ProductId,-5} {product.ProductName,-25} {product.TotalQuantitySold,10} R{product.TotalRevenue,12:F2}");
             ConsoleHelper.PrintTableBot(TopProductsTableWidth);
         }
         else
@@ -118,7 +118,7 @@ internal static class SalesReportPrinter
             ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{"Date",-14} {"Orders",8} {"Revenue",12}");
             ConsoleHelper.PrintTableMid(DailySalesTableWidth);
             foreach (var day in dailyList)
-                ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{day.Date:yyyy-MM-dd}     {day.OrderCount,8} {day.Revenue,12:F2}");
+                ConsoleHelper.PrintTableRow(DailySalesTableWidth, $"{day.Date:yyyy-MM-dd}     {day.OrderCount,8} R{day.Revenue,12:F2}");
             ConsoleHelper.PrintTableBot(DailySalesTableWidth);
         }
         else

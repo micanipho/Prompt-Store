@@ -1,3 +1,5 @@
+using Domain.Interfaces;
+
 namespace Domain.Factories;
 
 using Domain.Entities;
@@ -7,13 +9,13 @@ using Domain.Enums;
 public interface IOrderFactory
 {
     /// <summary>Creates a new Order entity with its associated OrderItems from a Customer's Cart.</summary>
-    Order CreateOrder(Customer customer, decimal totalAmount);
+    Order CreateOrder(Customer customer, decimal subtotal, IDiscountStrategy discountStrategy);
 }
 
 /// <summary>Implementation of the OrderFactory.</summary>
 public class OrderFactory : IOrderFactory
 {
-    public Order CreateOrder(Customer customer, decimal totalAmount)
+    public Order CreateOrder(Customer customer, decimal subtotal, IDiscountStrategy discountStrategy)
     {
         var orderItems = customer.Cart.Items.Select(cartItem => new OrderItem
         {
@@ -22,10 +24,13 @@ public class OrderFactory : IOrderFactory
             UnitPrice = cartItem.Product.Price
         }).ToList();
 
+        var finalTotal = discountStrategy.CalculateTotal(subtotal);
+
         return new Order
         {
             Items = orderItems,
-            Total = totalAmount,
+            Total = finalTotal,
+            DiscountApplied = discountStrategy.Name,
             Status = OrderStatus.Pending,
             PlacedAt = DateTime.Now,
             Customer = customer

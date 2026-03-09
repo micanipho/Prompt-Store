@@ -135,7 +135,7 @@ internal static class ConsoleHelper
         PrintTableRow(ProductTableWidth, $"{"ID",-5} {"Name",-25} {"Category",-15} {"Price",10} {"Stock",6}");
         PrintTableMid(ProductTableWidth);
         foreach (var product in list)
-            PrintTableRow(ProductTableWidth, $"{product.Id,-5} {product.Name,-25} {product.Category,-15} {product.Price,10:F2} {product.Stock,6}");
+            PrintTableRow(ProductTableWidth, $"{product.Id,-5} {product.Name,-25} {product.Category,-15} R{product.Price,10:F2} {product.Stock,6}");
         PrintTableBot(ProductTableWidth);
     }
 
@@ -155,9 +155,9 @@ internal static class ConsoleHelper
         PrintTableRow(CartTableWidth, $"{"ID",-5} {"Product",-25} {"Price",10} {"Qty",5} {"Subtotal",10}");
         PrintTableMid(CartTableWidth);
         foreach (var item in list)
-            PrintTableRow(CartTableWidth, $"{item.Product.Id,-5} {item.Product.Name,-25} {item.Product.Price,10:F2} {item.Quantity,5} {item.Product.Price * item.Quantity,10:F2}");
+            PrintTableRow(CartTableWidth, $"{item.Product.Id,-5} {item.Product.Name,-25} {item.Product.Price,10:F2} {item.Quantity,5} R{item.Product.Price * item.Quantity,10:F2}");
         PrintTableMid(CartTableWidth);
-        PrintTableRow(CartTableWidth, $"{"Total:",-49} {total,10:F2}");
+        PrintTableRow(CartTableWidth, $"{"Total:",-49} R{total,10:F2}");
         PrintTableBot(CartTableWidth);
     }
 
@@ -177,7 +177,7 @@ internal static class ConsoleHelper
         PrintTableRow(OrderTableWidth, $"{"ID",-5} {"Placed At",-22} {"Status",-12} {"Items",6} {"Total",10}");
         PrintTableMid(OrderTableWidth);
         foreach (var order in list)
-            PrintTableRow(OrderTableWidth, $"{order.Id,-5} {order.PlacedAt,-22:yyyy-MM-dd HH:mm:ss} {order.Status,-12} {order.Items.Count,6} {order.Total,10:F2}");
+            PrintTableRow(OrderTableWidth, $"{order.Id,-5} {order.PlacedAt,-22:yyyy-MM-dd HH:mm:ss} {order.Status,-12} {order.Items.Count,6} R{order.Total,10:F2}");
         PrintTableBot(OrderTableWidth);
     }
 
@@ -187,14 +187,17 @@ internal static class ConsoleHelper
     public static void PrintOrderDetails(Order order)
     {
         PrintInfo($"Order #{order.Id}  \u2502  Placed: {order.PlacedAt:yyyy-MM-dd HH:mm:ss}  \u2502  Status: {order.Status}");
+        if (!string.IsNullOrEmpty(order.DiscountApplied) && order.DiscountApplied != "None")
+            PrintInfo($"Discount: {order.DiscountApplied}");
+            
         Console.WriteLine();
         PrintTableTop(OrderDetailsTableWidth);
         PrintTableRow(OrderDetailsTableWidth, $"{"Product",-30} {"Unit Price",10} {"Qty",5} {"Subtotal",10}");
         PrintTableMid(OrderDetailsTableWidth);
         foreach (var item in order.Items)
-            PrintTableRow(OrderDetailsTableWidth, $"{item.Product.Name,-30} {item.UnitPrice,10:F2} {item.Quantity,5} {item.UnitPrice * item.Quantity,10:F2}");
+            PrintTableRow(OrderDetailsTableWidth, $"{item.Product.Name,-30} R{item.UnitPrice,10:F2} {item.Quantity,5} R{item.UnitPrice * item.Quantity,10:F2}");
         PrintTableMid(OrderDetailsTableWidth);
-        PrintTableRow(OrderDetailsTableWidth, $"{"Total:",-47} {order.Total,10:F2}");
+        PrintTableRow(OrderDetailsTableWidth, $"{"Total:",-47} R{order.Total,10:F2}");
         PrintTableBot(OrderDetailsTableWidth);
     }
 

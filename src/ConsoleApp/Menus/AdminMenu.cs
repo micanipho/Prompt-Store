@@ -126,7 +126,7 @@ public class AdminMenu : BaseMenu
             var category = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(category)) category = existing.Category;
 
-            Console.Write($"  Price [{existing.Price:F2}]: ");
+            Console.Write($"  Price [R{existing.Price:F2}]: ");
             var priceInput = Console.ReadLine()?.Trim();
             decimal price;
             if (string.IsNullOrWhiteSpace(priceInput))

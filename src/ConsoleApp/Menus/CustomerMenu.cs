@@ -247,8 +247,8 @@ public partial class CustomerMenu : BaseMenu
         }
 
         Console.WriteLine();
-        ConsoleHelper.PrintInfo($"Wallet Balance: {_customer.Balance:F2}");
-        ConsoleHelper.PrintInfo($"Order Total:    {total:F2}");
+        ConsoleHelper.PrintInfo($"Wallet Balance: R{_customer.Balance:F2}");
+        ConsoleHelper.PrintInfo($"Order Total:    R{total:F2}");
         Console.WriteLine();
         ConsoleHelper.PrintPrompt("Confirm order? (y/n): ");
 
@@ -280,7 +280,7 @@ public partial class CustomerMenu : BaseMenu
     {
         Console.Clear();
         ConsoleHelper.PrintHeader("Wallet Balance");
-        ConsoleHelper.PrintInfo($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintInfo($"Current Balance: R{PaymentService.GetBalance(_customer):F2}");
         ConsoleHelper.PressAnyKey();
     }
 
@@ -288,13 +288,13 @@ public partial class CustomerMenu : BaseMenu
     {
         Console.Clear();
         ConsoleHelper.PrintHeader("Add Wallet Funds");
-        ConsoleHelper.PrintInfo($"Current Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintInfo($"Current Balance: R{PaymentService.GetBalance(_customer):F2}");
         Console.WriteLine();
 
         var amount = ConsoleHelper.ReadPositiveDecimal("  Enter amount to add: ");
 
         _paymentService.AddFunds(_customer, new AddFundsRequest { Amount = amount });
-        ConsoleHelper.PrintSuccess($"Funds added successfully. New Balance: {PaymentService.GetBalance(_customer):F2}");
+        ConsoleHelper.PrintSuccess($"Funds added successfully. New Balance: R{PaymentService.GetBalance(_customer):F2}");
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
