@@ -3,6 +3,9 @@ namespace Domain.Entities;
 /// <summary>Represents a customer review and rating for a product.</summary>
 public class Review
 {
+    public const int MinRating = 1;
+    public const int MaxRating = 5;
+
     public virtual int Id { get; set; }
     public virtual int ProductId { get; set; }
     public virtual int CustomerId { get; set; }

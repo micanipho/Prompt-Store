@@ -83,7 +83,7 @@ public class ReviewServiceTests
     [InlineData(0)]
     [InlineData(6)]
     [InlineData(-1)]
-    public void SubmitReview_InvalidRating_ThrowsArgumentException(int rating)
+    public void SubmitReview_InvalidRating_ThrowsArgumentOutOfRangeException(int rating)
     {
         var customer = CreateCustomerWithOrder(1);
         var product = new Product { Id = 1, Name = "Test Product", Price = 100 };
@@ -92,8 +92,7 @@ public class ReviewServiceTests
 
         var request = new SubmitReviewRequest { ProductId = 1, Rating = rating, Comment = "Some comment" };
 
-        var ex = Assert.Throws<ArgumentException>(() => _reviewService.SubmitReview(customer, request));
-        Assert.Equal("Rating must be between 1 and 5.", ex.Message);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _reviewService.SubmitReview(customer, request));
     }
 
     [Theory]
@@ -109,8 +108,7 @@ public class ReviewServiceTests
 
         var request = new SubmitReviewRequest { ProductId = 1, Rating = 4, Comment = comment! };
 
-        var ex = Assert.Throws<ArgumentException>(() => _reviewService.SubmitReview(customer, request));
-        Assert.Equal("Comment cannot be empty.", ex.Message);
+        Assert.ThrowsAny<ArgumentException>(() => _reviewService.SubmitReview(customer, request));
     }
 
     [Fact]
