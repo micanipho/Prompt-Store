@@ -19,7 +19,14 @@
       "Bash(dotnet build src/ConsoleApp/ConsoleApp.csproj --no-dependencies)",
       "Bash(dotnet test --no-build tests/Application.Tests)",
       "Bash(dotnet build --nologo)",
-      "Bash(dotnet test --nologo)"
+      "Bash(dotnet test --nologo)",
+      "Bash(dotnet build src/Domain/Domain.csproj --no-restore)",
+      "Bash(dotnet build src/Application/Application.csproj --no-restore)",
+      "Bash(dotnet build src/Infrastructure/Infrastructure.csproj --no-restore)",
+      "Bash(taskkill //PID 170104 //F)",
+      "Bash(dotnet build src/ConsoleApp/ConsoleApp.csproj --no-restore)",
+      "Bash(dotnet test --no-restore)",
+      "Bash(dotnet test tests/Application.Tests --no-restore)"
     ]
   }
 }

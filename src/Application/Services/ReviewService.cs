@@ -30,11 +30,8 @@ public class ReviewService
         if (_reviewRepository.HasCustomerReviewed(customer.Id, request.ProductId))
             throw new InvalidOperationException("You have already reviewed this product.");
 
-        if (request.Rating < 1 || request.Rating > 5)
-            throw new ArgumentException("Rating must be between 1 and 5.");
-
-        if (string.IsNullOrWhiteSpace(request.Comment))
-            throw new ArgumentException("Comment cannot be empty.");
+        Guard.Against.OutOfRange(request.Rating, nameof(request.Rating), Review.MinRating, Review.MaxRating);
+        Guard.Against.NullOrWhiteSpace(request.Comment, message: "Comment cannot be empty.");
 
         var review = new Review
         {

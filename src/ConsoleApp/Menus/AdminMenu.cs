@@ -108,10 +108,8 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.WriteLine();
-        Console.Write("  Enter Product ID to update: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
+        if (!ConsoleHelper.TryReadInt("  Enter Product ID to update: ", out var id))
         {
-            ConsoleHelper.PrintError("Invalid ID.");
             ConsoleHelper.PressAnyKey();
             return;
         }
@@ -183,10 +181,8 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.WriteLine();
-        Console.Write("  Enter Product ID to delete: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var id))
+        if (!ConsoleHelper.TryReadInt("  Enter Product ID to delete: ", out var id))
         {
-            ConsoleHelper.PrintError("Invalid ID.");
             ConsoleHelper.PressAnyKey();
             return;
         }
@@ -227,10 +223,8 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintOrderTable(_orderService.GetAllOrders());
 
         Console.WriteLine();
-        Console.Write("  Enter Order ID: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var orderId))
+        if (!ConsoleHelper.TryReadInt("  Enter Order ID: ", out var orderId))
         {
-            ConsoleHelper.PrintError("Invalid Order ID.");
             ConsoleHelper.PressAnyKey();
             return;
         }
@@ -273,18 +267,14 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
 
         Console.WriteLine();
-        Console.Write("  Enter Product ID to restock: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
+        if (!ConsoleHelper.TryReadInt("  Enter Product ID to restock: ", out var productId))
         {
-            ConsoleHelper.PrintError("Invalid ID.");
             ConsoleHelper.PressAnyKey();
             return;
         }
 
-        Console.Write("  Enter quantity to add: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var quantity))
+        if (!ConsoleHelper.TryReadInt("  Enter quantity to add: ", out var quantity))
         {
-            ConsoleHelper.PrintError("Invalid quantity.");
             ConsoleHelper.PressAnyKey();
             return;
         }
@@ -320,7 +310,7 @@ public class AdminMenu(ProductService productService, OrderService orderService,
         Console.Clear();
         ConsoleHelper.PrintHeader("Sales Report");
 
-        ConsoleHelper.PrintSalesReport(
+        SalesReportPrinter.PrintSalesReport(
             _reportService.GetTotalOrders(),
             _reportService.GetTotalRevenue(),
             _reportService.GetAverageOrderValue(),

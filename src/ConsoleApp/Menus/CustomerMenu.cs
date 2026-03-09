@@ -1,7 +1,7 @@
 namespace ConsoleApp.Menus;
 
 /// <summary>Displays the customer menu with shopping, order, and wallet options.</summary>
-public class CustomerMenu
+public partial class CustomerMenu
 {
     private readonly Customer _customer;
     private readonly ProductService _productService;
@@ -82,6 +82,8 @@ public class CustomerMenu
         }
     }
 
+    #region Shopping
+
     private void BrowseProducts()
     {
         Console.Clear();
@@ -114,7 +116,7 @@ public class CustomerMenu
             var product = _productService.GetProductById(productId);
             Console.Clear();
             ConsoleHelper.PrintHeader($"Reviews for {product.Name}");
-            ConsoleHelper.PrintProductReviews(_reviewService.GetProductReviews(productId));
+            SalesReportPrinter.PrintProductReviews(_reviewService.GetProductReviews(productId));
         }
         catch (Exception ex)
         {
@@ -163,31 +165,23 @@ public class CustomerMenu
         Console.Clear();
         ConsoleHelper.PrintHeader("Add Product to Cart");
         ConsoleHelper.PrintProductTable(_productService.GetAllProducts());
-
         Console.WriteLine();
-        Console.Write("  Enter Product ID: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
+
+        if (!ConsoleHelper.TryReadInt("  Enter Product ID: ", out var productId))
         {
-            ConsoleHelper.PrintError("Invalid Product ID.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             return;
         }
 
-        Console.Write("  Enter Quantity: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var quantity))
+        if (!ConsoleHelper.TryReadInt("  Enter Quantity: ", out var quantity))
         {
-            ConsoleHelper.PrintError("Invalid quantity.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             return;
         }
 
         try
         {
-            _cartService.AddToCart(_customer, new AddToCartRequest
-            {
-                ProductId = productId,
-                Quantity = quantity
-            });
+            _cartService.AddToCart(_customer, new AddToCartRequest { ProductId = productId, Quantity = quantity });
             ConsoleHelper.PrintSuccess("Product added to cart successfully.");
         }
         catch (Exception ex)
@@ -198,13 +192,15 @@ public class CustomerMenu
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
+    #endregion
+
+    #region Cart & Checkout
+
     private void ViewCart()
     {
         Console.Clear();
         ConsoleHelper.PrintHeader("Your Cart");
-        var items = _cartService.GetCartItems(_customer);
-        var total = _cartService.GetCartTotal(_customer);
-        ConsoleHelper.PrintCartTable(items, total);
+        ConsoleHelper.PrintCartTable(_cartService.GetCartItems(_customer), _cartService.GetCartTotal(_customer));
         ConsoleHelper.PressAnyKey();
     }
 
@@ -213,8 +209,7 @@ public class CustomerMenu
         Console.Clear();
         ConsoleHelper.PrintHeader("Update Cart");
         var items = _cartService.GetCartItems(_customer);
-        var total = _cartService.GetCartTotal(_customer);
-        ConsoleHelper.PrintCartTable(items, total);
+        ConsoleHelper.PrintCartTable(items, _cartService.GetCartTotal(_customer));
 
         if (!items.Any())
         {
@@ -223,32 +218,22 @@ public class CustomerMenu
         }
 
         Console.WriteLine();
-        Console.Write("  Enter Product ID to update: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
+        if (!ConsoleHelper.TryReadInt("  Enter Product ID to update: ", out var productId))
         {
-            ConsoleHelper.PrintError("Invalid Product ID.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             return;
         }
 
-        Console.Write("  Enter new quantity (0 to remove): ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var newQuantity))
+        if (!ConsoleHelper.TryReadInt("  Enter new quantity (0 to remove): ", out var newQuantity))
         {
-            ConsoleHelper.PrintError("Invalid quantity.");
             Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
             return;
         }
 
         try
         {
-            _cartService.UpdateCartItem(_customer, new UpdateCartItemRequest
-            {
-                ProductId = productId,
-                NewQuantity = newQuantity
-            });
-            ConsoleHelper.PrintSuccess(newQuantity == 0
-                ? "Product removed from cart."
-                : "Cart updated successfully.");
+            _cartService.UpdateCartItem(_customer, new UpdateCartItemRequest { ProductId = productId, NewQuantity = newQuantity });
+            ConsoleHelper.PrintSuccess(newQuantity == 0 ? "Product removed from cart." : "Cart updated successfully.");
         }
         catch (Exception ex)
         {
@@ -299,6 +284,10 @@ public class CustomerMenu
         ConsoleHelper.PressAnyKey();
     }
 
+    #endregion
+
+    #region Wallet
+
     private void ViewWalletBalance()
     {
         Console.Clear();
@@ -321,127 +310,5 @@ public class CustomerMenu
         Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
     }
 
-    private void ViewOrderHistory()
-    {
-        Console.Clear();
-        ConsoleHelper.PrintHeader("Order History");
-        ConsoleHelper.PrintOrderTable(_orderService.GetOrderHistory(_customer));
-        ConsoleHelper.PressAnyKey();
-    }
-
-    private void TrackOrders()
-    {
-        Console.Clear();
-        ConsoleHelper.PrintHeader("Track Orders");
-
-        var orders = _orderService.GetOrderHistory(_customer);
-        ConsoleHelper.PrintOrderTable(orders);
-
-        if (!orders.Any())
-        {
-            ConsoleHelper.PressAnyKey();
-            return;
-        }
-
-        Console.WriteLine();
-        ConsoleHelper.PrintPrompt("Enter Order ID to view details (or press Enter to go back): ");
-        var input = Console.ReadLine();
-
-        if (string.IsNullOrWhiteSpace(input))
-            return;
-
-        if (!int.TryParse(input, out var orderId))
-        {
-            ConsoleHelper.PrintError("Invalid Order ID.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
-        }
-
-        if (!_customer.OrderHistory.Any(o => o.Id == orderId))
-        {
-            ConsoleHelper.PrintWarning("Order not found in your history.");
-        }
-        else
-        {
-            try
-            {
-                var order = _orderService.GetOrderById(orderId);
-                Console.Clear();
-                ConsoleHelper.PrintHeader("Order Details");
-                ConsoleHelper.PrintOrderDetails(order);
-            }
-            catch (Exception ex)
-            {
-                ConsoleHelper.PrintError(ex.Message);
-            }
-        }
-
-        ConsoleHelper.PressAnyKey();
-    }
-
-    private void ReviewProduct()
-    {
-        Console.Clear();
-        ConsoleHelper.PrintHeader("Review a Product");
-
-        var purchasedProducts = _customer.OrderHistory
-            .SelectMany(order => order.Items)
-            .Select(item => item.Product)
-            .DistinctBy(product => product.Id)
-            .ToList();
-
-        if (!purchasedProducts.Any())
-        {
-            ConsoleHelper.PrintWarning("You have no purchased products to review.");
-            ConsoleHelper.PressAnyKey();
-            return;
-        }
-
-        ConsoleHelper.PrintSubHeader("Your Purchased Products");
-        Console.WriteLine();
-        ConsoleHelper.PrintProductTable(purchasedProducts);
-
-        Console.WriteLine();
-        Console.Write("  Enter Product ID to review: ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var productId))
-        {
-            ConsoleHelper.PrintError("Invalid Product ID.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
-        }
-
-        if (!purchasedProducts.Any(p => p.Id == productId))
-        {
-            ConsoleHelper.PrintError("You have not purchased this product.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
-        }
-
-        Console.Write("  Enter Rating (1-5): ");
-        if (!int.TryParse(Console.ReadLine()?.Trim(), out var rating) || rating < 1 || rating > 5)
-        {
-            ConsoleHelper.PrintError("Invalid rating. Must be a whole number between 1 and 5.");
-            Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-            return;
-        }
-
-        var comment = ConsoleHelper.ReadNonEmptyString("  Enter your review comment: ");
-
-        try
-        {
-            _reviewService.SubmitReview(_customer, new SubmitReviewRequest
-            {
-                ProductId = productId,
-                Rating = rating,
-                Comment = comment
-            });
-            ConsoleHelper.PrintSuccess("Review submitted successfully!");
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.PrintError(ex.Message);
-        }
-
-        Thread.Sleep(ConsoleHelper.FeedbackDelayMs);
-    }
+    #endregion
 }

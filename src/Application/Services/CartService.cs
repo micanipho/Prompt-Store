@@ -46,8 +46,7 @@ public class CartService
     /// <summary>Updates the quantity of a cart item. Set NewQuantity to 0 to remove the item.</summary>
     public void UpdateCartItem(Customer customer, UpdateCartItemRequest request)
     {
-        if (request.NewQuantity < 0)
-            throw new ArgumentException("Quantity cannot be negative.");
+        Guard.Against.Negative(request.NewQuantity, message: "Quantity cannot be negative.");
 
         var cartItem = customer.Cart.Items.FirstOrDefault(i => i.Product.Id == request.ProductId)
             ?? throw new InvalidOperationException("Product not found in cart.");

@@ -107,7 +107,7 @@ internal static class ConsoleHelper
     }
 
     /// <summary>Writes colored text to the console and resets the color.</summary>
-    private static void WriteColored(string text, ConsoleColor color)
+    internal static void WriteColored(string text, ConsoleColor color)
     {
         var saved = Console.ForegroundColor;
         Console.ForegroundColor = color;
@@ -181,38 +181,43 @@ internal static class ConsoleHelper
         PrintTableBot(OrderTableWidth);
     }
 
+    private const int OrderDetailsTableWidth = 59;
+
     /// <summary>Prints the full details of a single order including all line items.</summary>
     public static void PrintOrderDetails(Order order)
     {
-        var width = 59;
         PrintInfo($"Order #{order.Id}  \u2502  Placed: {order.PlacedAt:yyyy-MM-dd HH:mm:ss}  \u2502  Status: {order.Status}");
         Console.WriteLine();
-        PrintTableTop(width);
-        PrintTableRow(width, $"{"Product",-30} {"Unit Price",10} {"Qty",5} {"Subtotal",10}");
-        PrintTableMid(width);
+        PrintTableTop(OrderDetailsTableWidth);
+        PrintTableRow(OrderDetailsTableWidth, $"{"Product",-30} {"Unit Price",10} {"Qty",5} {"Subtotal",10}");
+        PrintTableMid(OrderDetailsTableWidth);
         foreach (var item in order.Items)
-            PrintTableRow(width, $"{item.Product.Name,-30} {item.UnitPrice,10:F2} {item.Quantity,5} {item.UnitPrice * item.Quantity,10:F2}");
-        PrintTableMid(width);
-        PrintTableRow(width, $"{"Total:",-47} {order.Total,10:F2}");
-        PrintTableBot(width);
+            PrintTableRow(OrderDetailsTableWidth, $"{item.Product.Name,-30} {item.UnitPrice,10:F2} {item.Quantity,5} {item.UnitPrice * item.Quantity,10:F2}");
+        PrintTableMid(OrderDetailsTableWidth);
+        PrintTableRow(OrderDetailsTableWidth, $"{"Total:",-47} {order.Total,10:F2}");
+        PrintTableBot(OrderDetailsTableWidth);
     }
 
-    private static void PrintTableTop(int innerWidth)
+    /// <summary>Prints the top border of a table.</summary>
+    internal static void PrintTableTop(int innerWidth)
     {
         WriteColored($"  \u250c{new string('\u2500', innerWidth + 2)}\u2510", ConsoleColor.DarkGray);
     }
 
-    private static void PrintTableMid(int innerWidth)
+    /// <summary>Prints a middle separator row in a table.</summary>
+    internal static void PrintTableMid(int innerWidth)
     {
         WriteColored($"  \u251c{new string('\u2500', innerWidth + 2)}\u2524", ConsoleColor.DarkGray);
     }
 
-    private static void PrintTableBot(int innerWidth)
+    /// <summary>Prints the bottom border of a table.</summary>
+    internal static void PrintTableBot(int innerWidth)
     {
         WriteColored($"  \u2514{new string('\u2500', innerWidth + 2)}\u2518", ConsoleColor.DarkGray);
     }
 
-    private static void PrintTableRow(int innerWidth, string content)
+    /// <summary>Prints a single content row inside a table.</summary>
+    internal static void PrintTableRow(int innerWidth, string content)
     {
         var padded = content.PadRight(innerWidth);
         var saved = Console.ForegroundColor;
@@ -227,133 +232,18 @@ internal static class ConsoleHelper
 
     #endregion
 
-    #region Reviews
-
-    /// <summary>Prints all reviews for a product, including average rating.</summary>
-    public static void PrintProductReviews(IEnumerable<Review> reviews)
-    {
-        var list = reviews.ToList();
-        if (!list.Any())
-        {
-            PrintWarning("No reviews yet.");
-            return;
-        }
-
-        var average = list.Average(r => r.Rating);
-        WriteColored($"  Average Rating: {average:F1}/5 ({list.Count} review{(list.Count == 1 ? "" : "s")})", ConsoleColor.Yellow);
-        Console.WriteLine();
-
-        foreach (var review in list)
-        {
-            var stars = new string('\u2605', review.Rating) + new string('\u2606', 5 - review.Rating);
-            var saved = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($"    {stars}");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"  ({review.Rating}/5)");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine($"    \"{review.Comment}\"");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine($"    \u2014 Customer #{review.CustomerId} on {review.CreatedAt:yyyy-MM-dd}");
-            Console.ForegroundColor = saved;
-            Console.WriteLine();
-        }
-    }
-
-    #endregion
-
-    #region Sales Report
-
-    private const int StatusTableWidth = 37;
-    private const int TopProductsTableWidth = 54;
-    private const int DailySalesTableWidth = 36;
-
-    /// <summary>Prints a full sales report including totals, order status breakdown, top products, and daily sales.</summary>
-    public static void PrintSalesReport(
-        int totalOrders,
-        decimal totalRevenue,
-        decimal averageOrderValue,
-        IEnumerable<OrderStatusSummary> statusSummaries,
-        IEnumerable<ProductSalesSummary> topProducts,
-        IEnumerable<DailySalesSummary> dailySales)
-    {
-        PrintOverview(totalOrders, totalRevenue, averageOrderValue);
-        PrintStatusBreakdown(statusSummaries);
-        PrintTopSellingProducts(topProducts);
-        PrintDailySalesBreakdown(dailySales);
-    }
-
-    private static void PrintOverview(int totalOrders, decimal totalRevenue, decimal averageOrderValue)
-    {
-        PrintSubHeader("Overview");
-        Console.WriteLine($"    Total Orders:         {totalOrders}");
-        Console.WriteLine($"    Total Revenue:        {totalRevenue:F2}");
-        Console.WriteLine($"    Average Order Value:  {averageOrderValue:F2}");
-        Console.WriteLine();
-    }
-
-    private static void PrintStatusBreakdown(IEnumerable<OrderStatusSummary> statusSummaries)
-    {
-        PrintSubHeader("Orders by Status");
-        var statusList = statusSummaries.ToList();
-        if (statusList.Any())
-        {
-            PrintTableTop(StatusTableWidth);
-            PrintTableRow(StatusTableWidth, $"{"Status",-15} {"Count",8} {"Revenue",12}");
-            PrintTableMid(StatusTableWidth);
-            foreach (var status in statusList)
-                PrintTableRow(StatusTableWidth, $"{status.Status,-15} {status.Count,8} {status.Total,12:F2}");
-            PrintTableBot(StatusTableWidth);
-        }
-        else
-        {
-            PrintWarning("No orders found.");
-        }
-        Console.WriteLine();
-    }
-
-    private static void PrintTopSellingProducts(IEnumerable<ProductSalesSummary> topProducts)
-    {
-        PrintSubHeader("Top Selling Products");
-        var productList = topProducts.ToList();
-        if (productList.Any())
-        {
-            PrintTableTop(TopProductsTableWidth);
-            PrintTableRow(TopProductsTableWidth, $"{"ID",-5} {"Product",-25} {"Qty Sold",10} {"Revenue",12}");
-            PrintTableMid(TopProductsTableWidth);
-            foreach (var product in productList)
-                PrintTableRow(TopProductsTableWidth, $"{product.ProductId,-5} {product.ProductName,-25} {product.TotalQuantitySold,10} {product.TotalRevenue,12:F2}");
-            PrintTableBot(TopProductsTableWidth);
-        }
-        else
-        {
-            PrintWarning("No sales data available.");
-        }
-        Console.WriteLine();
-    }
-
-    private static void PrintDailySalesBreakdown(IEnumerable<DailySalesSummary> dailySales)
-    {
-        PrintSubHeader("Daily Sales");
-        var dailyList = dailySales.ToList();
-        if (dailyList.Any())
-        {
-            PrintTableTop(DailySalesTableWidth);
-            PrintTableRow(DailySalesTableWidth, $"{"Date",-14} {"Orders",8} {"Revenue",12}");
-            PrintTableMid(DailySalesTableWidth);
-            foreach (var day in dailyList)
-                PrintTableRow(DailySalesTableWidth, $"{day.Date:yyyy-MM-dd}     {day.OrderCount,8} {day.Revenue,12:F2}");
-            PrintTableBot(DailySalesTableWidth);
-        }
-        else
-        {
-            PrintWarning("No sales data available.");
-        }
-    }
-
-    #endregion
-
     #region Input Helpers
+
+    /// <summary>Attempts to read and parse an integer from the console. Returns false if the input is not a valid integer.</summary>
+    public static bool TryReadInt(string prompt, out int value)
+    {
+        Console.Write(prompt);
+        if (int.TryParse(Console.ReadLine()?.Trim(), out value))
+            return true;
+
+        PrintError("Invalid number.");
+        return false;
+    }
 
     /// <summary>Reads a non-empty, trimmed string from the console. Re-prompts until valid input is provided.</summary>
     public static string ReadNonEmptyString(string prompt)

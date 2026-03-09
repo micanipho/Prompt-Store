@@ -24,6 +24,7 @@ public class MainMenu
         _paymentService = paymentService;
     }
 
+    /// <summary>Displays the main menu in a loop until the user exits the application.</summary>
     public void Show()
     {
         while (true)
