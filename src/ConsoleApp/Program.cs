@@ -49,7 +49,7 @@ public class Program
         return new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production"}.json", optional: true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Development"}.json", optional: true)
             .Build();
     }
 
@@ -73,6 +73,7 @@ public class Program
         services.AddScoped<IReviewRepository, EfReviewRepository>();
 
         // Application Services
+        services.AddScoped<IPdfGenerator, Infrastructure.Services.QuestPdfGenerator>();
         services.AddScoped<IUserFactory, UserFactory>();
         services.AddScoped<IOrderFactory, OrderFactory>();
         services.AddScoped<IProductFactory, ProductFactory>();

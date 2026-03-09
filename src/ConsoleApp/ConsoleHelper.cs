@@ -115,6 +115,19 @@ internal static class ConsoleHelper
         Console.ForegroundColor = saved;
     }
 
+    /// <summary>Finds the project root directory by looking for the solution file.</summary>
+    public static string GetProjectRoot()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current != null)
+        {
+            if (current.GetFiles("OnlineShopping.slnx").Any())
+                return current.FullName;
+            current = current.Parent;
+        }
+        return AppContext.BaseDirectory; // Fallback
+    }
+
     #endregion
 
     #region Tables
