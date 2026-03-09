@@ -11,8 +11,9 @@ public class MainMenu : BaseMenu
     private readonly ReportService _reportService;
     private readonly ReviewService _reviewService;
     private readonly PaymentService _paymentService;
+    private readonly IPdfGenerator _pdfGenerator;
 
-    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService, PaymentService paymentService)
+    public MainMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService, PaymentService paymentService, IPdfGenerator pdfGenerator)
     {
         _authService = authService;
         _productService = productService;
@@ -22,6 +23,7 @@ public class MainMenu : BaseMenu
         _reportService = reportService;
         _reviewService = reviewService;
         _paymentService = paymentService;
+        _pdfGenerator = pdfGenerator;
 
         // Register Commands
         AddCommand("1", "Login", ShowLogin);
@@ -74,7 +76,7 @@ public class MainMenu : BaseMenu
 
     private void ShowLogin()
     {
-        new LoginMenu(_authService, _productService, _cartService, _orderService, _inventoryService, _reportService, _reviewService, _paymentService).Show();
+        new LoginMenu(_authService, _productService, _cartService, _orderService, _inventoryService, _reportService, _reviewService, _paymentService, _pdfGenerator).Show();
     }
 
     private void ShowRegister()

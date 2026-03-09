@@ -11,8 +11,9 @@ public class LoginMenu
     private readonly ReportService _reportService;
     private readonly ReviewService _reviewService;
     private readonly PaymentService _paymentService;
+    private readonly IPdfGenerator _pdfGenerator;
 
-    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService, PaymentService paymentService)
+    public LoginMenu(AuthService authService, ProductService productService, CartService cartService, OrderService orderService, InventoryService inventoryService, ReportService reportService, ReviewService reviewService, PaymentService paymentService, IPdfGenerator pdfGenerator)
     {
         _authService = authService;
         _productService = productService;
@@ -22,6 +23,7 @@ public class LoginMenu
         _reportService = reportService;
         _reviewService = reviewService;
         _paymentService = paymentService;
+        _pdfGenerator = pdfGenerator;
     }
 
     /// <summary>Prompts for credentials, authenticates the user, and opens the role-specific menu.</summary>
@@ -51,7 +53,7 @@ public class LoginMenu
 
             if (user.Role == UserRole.Admin)
             {
-                new AdminMenu(_productService, _orderService, _inventoryService, _reportService).Show();
+                new AdminMenu(_productService, _orderService, _inventoryService, _reportService, _pdfGenerator).Show();
             }
             else
             {

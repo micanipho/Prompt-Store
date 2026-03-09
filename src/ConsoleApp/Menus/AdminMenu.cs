@@ -7,13 +7,15 @@ public class AdminMenu : BaseMenu
     private readonly OrderService _orderService;
     private readonly InventoryService _inventoryService;
     private readonly ReportService _reportService;
+    private readonly IPdfGenerator _pdfGenerator;
 
-    public AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService, ReportService reportService)
+    public AdminMenu(ProductService productService, OrderService orderService, InventoryService inventoryService, ReportService reportService, IPdfGenerator pdfGenerator)
     {
         _productService = productService;
         _orderService = orderService;
         _inventoryService = inventoryService;
         _reportService = reportService;
+        _pdfGenerator = pdfGenerator;
 
         // Register Commands
         AddCommand("1", "Add Product", AddProduct);
@@ -25,6 +27,8 @@ public class AdminMenu : BaseMenu
         AddCommand("7", "View Orders", ViewOrders);
         AddCommand("8", "Update Order Status", UpdateOrderStatus);
         AddCommand("9", "Generate Sales Reports", GenerateSalesReport);
+        AddCommand("10", "Export Sales Report (PDF)", ExportSalesReportPdf);
+        AddCommand("11", "Export Inventory (PDF)", ExportInventoryPdf);
     }
 
     protected override string Header => "Administrator Menu";
@@ -38,6 +42,7 @@ public class AdminMenu : BaseMenu
         ConsoleHelper.PrintMenuOption("4", _commands["4"].Description);
         ConsoleHelper.PrintMenuOption("5", _commands["5"].Description);
         ConsoleHelper.PrintMenuOption("6", _commands["6"].Description);
+        ConsoleHelper.PrintMenuOption("11", _commands["11"].Description);
         Console.WriteLine();
 
         ConsoleHelper.PrintSubHeader("Order Management");
@@ -47,6 +52,7 @@ public class AdminMenu : BaseMenu
 
         ConsoleHelper.PrintSubHeader("Analytics");
         ConsoleHelper.PrintMenuOption("9", _commands["9"].Description);
+        ConsoleHelper.PrintMenuOption("10", _commands["10"].Description);
         Console.WriteLine();
     }
 
@@ -313,6 +319,71 @@ public class AdminMenu : BaseMenu
             _reportService.GetOrdersByStatus(),
             _reportService.GetTopSellingProducts(),
             _reportService.GetDailySales());
+
+        ConsoleHelper.PressAnyKey();
+    }
+
+    private void ExportSalesReportPdf()
+    {
+        Console.Clear();
+        ConsoleHelper.PrintHeader("Export Sales Report to PDF");
+
+        try
+        {
+            var reportsDir = Path.Combine(ConsoleHelper.GetProjectRoot(), "Reports");
+            if (!Directory.Exists(reportsDir)) Directory.CreateDirectory(reportsDir);
+
+            var fileName = $"Sales_Report_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.pdf";
+            var filePath = Path.Combine(reportsDir, fileName);
+
+            Console.WriteLine("  Generating PDF...");
+            _pdfGenerator.GenerateSalesReport(
+                _reportService.GetTotalOrders(),
+                _reportService.GetTotalRevenue(),
+                _reportService.GetAverageOrderValue(),
+                _reportService.GetOrdersByStatus(),
+                _reportService.GetTopSellingProducts(),
+                _reportService.GetDailySales(),
+                filePath);
+
+            ConsoleHelper.PrintSuccess($"Report exported successfully to:");
+            Console.WriteLine($"  {filePath}");
+        }
+        catch (Exception ex)
+        {
+            ConsoleHelper.PrintError($"Failed to export report: {ex.Message}");
+        }
+
+        ConsoleHelper.PressAnyKey();
+    }
+
+    private void ExportInventoryPdf()
+    {
+        Console.Clear();
+        ConsoleHelper.PrintHeader("Export Inventory to PDF");
+
+        try
+        {
+            var reportsDir = Path.Combine(ConsoleHelper.GetProjectRoot(), "Reports");
+            if (!Directory.Exists(reportsDir)) Directory.CreateDirectory(reportsDir);
+
+            var fileName = $"Inventory_Report_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.pdf";
+            var filePath = Path.Combine(reportsDir, fileName);
+
+            Console.WriteLine("  Generating PDF...");
+            _pdfGenerator.GenerateInventoryReport(
+                _productService.GetAllProducts(),
+                _inventoryService.GetLowStockProducts(),
+                _inventoryService.GetOutOfStockProducts(),
+                filePath);
+
+            ConsoleHelper.PrintSuccess($"Inventory exported successfully to:");
+            Console.WriteLine($"  {filePath}");
+        }
+        catch (Exception ex)
+        {
+            ConsoleHelper.PrintError($"Failed to export inventory: {ex.Message}");
+        }
 
         ConsoleHelper.PressAnyKey();
     }
