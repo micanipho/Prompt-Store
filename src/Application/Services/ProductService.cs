@@ -1,13 +1,17 @@
+using Domain.Factories;
+
 namespace Application.Services;
 
 /// <summary>Handles product catalog operations: add, update, delete, and querying.</summary>
 public class ProductService
 {
     private readonly IProductRepository _productRepository;
+    private readonly IProductFactory _productFactory;
 
-    public ProductService(IProductRepository productRepository)
+    public ProductService(IProductRepository productRepository, IProductFactory productFactory)
     {
         _productRepository = productRepository;
+        _productFactory = productFactory;
     }
 
     /// <summary>Adds a new product to the catalog. Throws if input is invalid.</summary>
@@ -19,14 +23,14 @@ public class ProductService
         Guard.Against.NegativeOrZero(request.Price, message: "Product price must be greater than zero.");
         Guard.Against.Negative(request.Stock, message: "Stock cannot be negative.");
 
-        _productRepository.Add(new Product
-        {
-            Name = request.Name,
-            Description = request.Description,
-            Price = request.Price,
-            Stock = request.Stock,
-            Category = request.Category
-        });
+        var product = _productFactory.CreateProduct(
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Stock,
+            request.Category);
+
+        _productRepository.Add(product);
     }
 
     /// <summary>Updates an existing product. Throws if the product is not found or input is invalid.</summary>
@@ -40,15 +44,15 @@ public class ProductService
         Guard.Against.NegativeOrZero(request.Price, message: "Product price must be greater than zero.");
         Guard.Against.Negative(request.Stock, message: "Stock cannot be negative.");
 
-        _productRepository.Update(new Product
-        {
-            Id = request.Id,
-            Name = request.Name,
-            Description = request.Description,
-            Price = request.Price,
-            Stock = request.Stock,
-            Category = request.Category
-        });
+        var product = _productFactory.CreateProduct(
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Stock,
+            request.Category);
+        product.Id = request.Id;
+
+        _productRepository.Update(product);
     }
 
     /// <summary>Deletes a product by ID. Throws if the product is not found.</summary>

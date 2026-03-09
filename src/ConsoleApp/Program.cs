@@ -72,6 +72,8 @@ public class Program
 
         // Application Services
         services.AddScoped<IUserFactory, UserFactory>();
+        services.AddScoped<IOrderFactory, OrderFactory>();
+        services.AddScoped<IProductFactory, ProductFactory>();
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<CartService>();
